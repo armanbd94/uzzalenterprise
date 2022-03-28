@@ -1616,6 +1616,9 @@ return [
     'Customer Report' => 'কাস্টমার রিপোর্ট',
     'Supplier Report' => 'সাপ্লাইয়ার রিপোর্ট',
     'Product Report'  => 'পণ্যের রিপোর্ট', 
+    'Session Name'  => 'সেশনের নাম', 
+    'Session Start'  => 'সেশন শুরু', 
+    'Session End'  => 'সেশন শেষ', 
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                              => 'ব্যাপারীর মালামাল উৎপাদন,ডেলিভারী,মিল ভাড়ার রিপোর্ট ',
@@ -1644,4 +1647,5 @@ return [
     'Paid amount cannot be bigger than net total amount'                                            => 'প্রদত্ত পরিমাণ মোট, মোট পরিমাণের চেয়ে বড় হতে পারে না',
     'Selected Data Has Been Delete Successfully'                                                    => 'নির্বাচিত ডেটা সফলভাবে মুছে ফেলা হয়েছে',
     'Failed To Delete Selected Data'                                                                => 'নির্বাচিত ডেটা মুছে ফেলতে ব্যর্থ',
+    'This session cannot delete because it is default session'                                     => 'এই সেশন ডাটা ডিলিট করা যাবে না কারন এটা সিস্টেম এর ডিফল্ট সেশন'
 ];

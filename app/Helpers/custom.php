@@ -196,3 +196,30 @@ if(!function_exists('generator'))
         return $con;
     }
 }
+
+function translate($number = 0, $lan = "en")
+{
+    if( $lan == "en" ){
+        return ConvertEnFromBn($number);
+    }
+    return ConvertBnFomEn($number);
+}
+/**
+ * Make The number as English from Bangla
+ */
+function ConvertEnFromBn($number)
+{
+    $standard_numsets = array("0","1","2","3","4","5","6","7","8","9");
+    $devanagari_numsets = array("০","১","২","৩","৪","৫","৬","৭","৮","৯");
+    return str_replace($devanagari_numsets, $standard_numsets, $number);
+}
+
+/**
+ * Make The number as Bangla from English
+ */
+function ConvertBnFomEn($number)
+{
+    $standard_numsets = array("0","1","2","3","4","5","6","7","8","9");
+    $devanagari_numsets = array("০","১","২","৩","৪","৫","৬","৭","৮","৯");
+    return str_replace($standard_numsets, $devanagari_numsets, $number);
+}

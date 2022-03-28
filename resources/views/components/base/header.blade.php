@@ -4,21 +4,42 @@
             <div class="dropdown show">
                 <a class="dropdown-toggle text-white text-uppercase" href="#" style="color:#000 !important"
                    role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="flag-icon {{ App::getLocale() == 'bn' ? 'flag-icon-bd' : 'flag-icon-us' }} margin-right-8px"></span> {{ Config::get('languages')[App::getLocale()] }}
+                    <span class="flag-icon {{ App::getLocale() == 'bn' ? 'flag-icon-bd' : 'flag-icon-us' }} mr-3"></span> {{ Config::get('languages')[App::getLocale()] }}
                 </a>
                 <div class="dropdown-menu text-small text-uppercase" aria-labelledby="dropdownMenuLink">
                     @foreach (Config::get('languages') as $lang => $language)
                         @if ($lang != App::getLocale())
                             <a href="{{url('language_switch',$lang)}}" style="color:#000 !important" class="dropdown-item" >
-                                <i class="flag-icon {{ $lang == 'bn' ? 'flag-icon-bd' : 'flag-icon-us' }} margin-right-8px"></i>{{ $language }}</a>
+                                <i class="flag-icon {{ $lang == 'bn' ? 'flag-icon-bd' : 'flag-icon-us' }} mr-3"></i>{{ $language }}</a>
                         @endif
                     @endforeach
                 </div>
             </div>
+            
         </div>
 
 
         <div class="topbar">
+            <div class="dropdown show mr-3" style="align-items: center !important;">
+                @php
+                    $session_list = DB::table('company_sessions')->pluck('session_name','id');
+                @endphp
+                <a class="dropdown-toggle text-white text-uppercase" href="#" style="color:#000 !important"
+                   role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   <i class='fas fa-life-ring text-primary mr-3'></i> {{ config('settings.active_session_id') ? translate(collect($session_list)->all()[config('settings.active_session_id')],App::getLocale()) : '' }}
+                </a>
+                <div class="dropdown-menu text-small text-uppercase" aria-labelledby="dropdownMenuLink">
+                    @php
+                    
+                    foreach ($session_list as $id => $session_name){
+                        if ($id != config('settings.active_session_id')){
+                            echo "<a href=".url('session/switch',$id)." style='color:#000 !important' class='dropdown-item'> ".translate($session_name,App::getLocale())."</a>";
+                        }
+                    }
+                    @endphp
+                    
+                </div>
+            </div>
             @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
             <div class="dropdown">
 

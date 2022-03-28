@@ -21,7 +21,7 @@
 @section('content')
 <div class="d-flex flex-column-fluid">
     <div class="container-fluid">
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-md-2">
                 <div class="bg-white text-center py-3  rounded-xl">
                     <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
@@ -76,9 +76,9 @@
                     <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Expense')}}</a>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <!-- Start :: Bar Chart-->
-        <div class="row py-5">
+        {{-- <div class="row py-5">
             <div class="col-md-12">
             <div class="card bar-chart">
                 <div class="card-header d-flex align-items-center">
@@ -91,7 +91,7 @@
                 </div>
             </div>
             </div>
-        </div>
+        </div> --}}
         <!-- End :: Bar Chart-->
     </div>
 </div>

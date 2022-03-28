@@ -37,4 +37,15 @@ Route::group(['middleware' => ['auth','language']], function () {
         Route::post('change-status', 'CustomerGroupController@change_status')->name('change.status');
     });
 
+    //Session Routes
+    Route::get('session', 'CompanySessionController@index')->name('session');
+    Route::group(['prefix' => 'session', 'as'=>'session.'], function () {
+        Route::post('datatable-data', 'CompanySessionController@get_datatable_data')->name('datatable.data');
+        Route::post('store-or-update', 'CompanySessionController@store_or_update_data')->name('store.or.update');
+        Route::post('edit', 'CompanySessionController@edit')->name('edit');
+        Route::post('delete', 'CompanySessionController@delete')->name('delete');
+        Route::post('bulk-delete', 'CompanySessionController@bulk_delete')->name('bulk.delete');
+        Route::get('switch/{id}', 'CompanySessionController@sessionSwitch')->name('switch');
+    });
+
 });

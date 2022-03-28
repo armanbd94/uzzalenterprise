@@ -1629,6 +1629,9 @@ return [
     'Customer Report' => 'Customer Report',
     'Supplier Report' => 'Supplier Report',
     'Product Report'  => 'Product Report', 
+    'Session Name'  => 'Session Name', 
+    'Session Start'  => 'Session Start', 
+    'Session End'  => 'Session End', 
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',
@@ -1652,4 +1655,5 @@ return [
     'Delivery quantity cannot be greater than ordered quantity!'                                        => 'Delivery quantity cannot be greater than ordered quantity!',
     'Total quantity cannot be greater than stock quantity!'                                             => 'Total quantity cannot be greater than stock quantity!',
     'Paid amount cannot be bigger than grand total amount'                                              => 'Paid amount cannot be bigger than grand total amount',
+    'This session cannot delete because it is default session'                                         => 'This session cannot delete because it is default session'
 ];
