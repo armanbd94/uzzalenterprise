@@ -134,7 +134,6 @@
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'<'float-right'p>>>",
 
             "buttons": [
-                @if (permission('customer-group-report'))
                 {
                     'extend':'colvis','className':'btn btn-secondary btn-sm text-white','text':'{{__('file.Column')}}','columns': ':gt(0)'
                 },
@@ -192,7 +191,6 @@
                         }
                     },
                 },
-                @endif
                 @if (permission('customer-group-bulk-delete'))
                 {
                     'className':'btn btn-danger btn-sm delete_btn d-none text-white',

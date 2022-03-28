@@ -1,8 +1,5 @@
 @extends('layouts.app')
 @section('title', $page_title)
-@push('styles')
-<link href="{{asset('css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet" type="text/css" />
-@endpush
 @section('content')
 <div class="d-flex flex-column-fluid">
     <div class="container-fluid">
@@ -14,8 +11,8 @@
                 </div>
                 <div class="card-toolbar">
                     <!--begin::Button-->
-                    @if (permission('session-add'))
-                    <a href="javascript:void(0);" onclick="showFormModal('{{__('file.Add New Session')}}','{{__('file.Save')}}')" class="btn btn-primary btn-sm font-weight-bolder">
+                    @if (permission('vehicle-add'))
+                    <a href="javascript:void(0);" onclick="showFormModal('{{__('file.Add New Vehicle')}}','{{__('file.Save')}}')" class="btn btn-primary btn-sm font-weight-bolder">
                         <i class="fas fa-plus-circle"></i> {{__('file.Add New')}}</a>
                     @endif
                     <!--end::Button-->
@@ -25,7 +22,26 @@
         <!--end::Notice-->
         <!--begin::Card-->
         <div class="card card-custom">
+            <div class="card-header flex-wrap py-5">
+                <form method="POST" id="form-filter" class="col-md-12 px-0">
+                    <div class="row">
+                        <x-form.textbox labelName="{{__('file.Name')}}" name="name" col="col-md-4" />
+                        <div class="col-md-8">
+                            <div style="margin-top:28px;">
+                                <div style="margin-top:28px;">
+                                    <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
+                                    data-toggle="tooltip" data-theme="dark" title="{{__('file.Reset')}}">
+                                    <i class="fas fa-undo-alt"></i></button>
 
+                                    <button id="btn-filter" class="btn btn-primary btn-sm btn-elevate btn-icon mr-2 float-right" type="button"
+                                    data-toggle="tooltip" data-theme="dark" title="{{__('file.Search')}}">
+                                    <i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
             <div class="card-body">
                 <!--begin: Datatable-->
                 <div id="kt_datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -34,7 +50,7 @@
                             <table id="dataTable" class="table table-bordered table-hover">
                                 <thead class="bg-primary">
                                     <tr>
-                                        @if (permission('session-bulk-delete'))
+                                        @if (permission('vehicle-bulk-delete'))
                                         <th>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="select_all" onchange="select_all()">
@@ -43,10 +59,11 @@
                                         </th>
                                         @endif
                                         <th>{{__('file.SL')}}</th>
-                                        <th>{{__('file.Session Name')}}</th>
-                                        <th>{{__('file.Session Start')}}</th>
-                                        <th>{{__('file.Session End')}}</th>
+                                        <th>{{__('file.Name')}}</th>
+                                        <th>{{__('file.Quantity')}}</th>
+                                        <th>{{__('file.Status')}}</th>
                                         <th>{{__('file.Created By')}}</th>
+                                        <th>{{__('file.Created At')}}</th>
                                         <th>{{__('file.Action')}}</th>
                                     </tr>
                                 </thead>
@@ -61,15 +78,12 @@
         <!--end::Card-->
     </div>
 </div>
-@include('setting::session.modal')
+@include('vehicle::modal')
 @endsection
 
 @push('scripts')
-<script src="{{asset('js/jquery-ui.js')}}"></script>
-<script src="{{asset('js/bootstrap-datetimepicker.min.js')}}"></script>
 <script>
     var table;
-    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
     $(document).ready(function(){
 
         table = $('#dataTable').DataTable({
@@ -91,27 +105,28 @@
                 zeroRecords: '<strong class="text-danger">{{__('file.No Data Found')}}</strong>'
             },
             "ajax": {
-                "url": "{{route('session.datatable.data')}}",
+                "url": "{{route('vehicle.datatable.data')}}",
                 "type": "POST",
                 "data": function (data) {
+                    data.name   = $("#form-filter #name").val();
                     data._token = _token;
                 }
             },
             "columnDefs": [{
 
-                @if (permission('session-bulk-delete'))
-                "targets": [0,6],
+                @if (permission('vehicle-bulk-delete'))
+                "targets": [0,7],
                 @else
-                "targets": [5],
+                "targets": [6],
                 @endif
                 "orderable": false,
                 "className": "text-center"
             },
             {
-                @if (permission('session-bulk-delete'))
-                "targets": [1,2,3,4,5],
+                @if (permission('vehicle-bulk-delete'))
+                "targets": [1,3,4,5,6],
                 @else
-                "targets": [0,1,2,3,4],
+                "targets": [0,2,3,4,5],
                 @endif
                 "className": "text-center"
             }
@@ -133,11 +148,12 @@
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
                         @if(permission('session-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(6))'
+                        columns: ':visible:not(:eq(0),:eq(7))'
                         @else
-                        columns: ':visible:not(:eq(5))'
+                        columns: ':visible:not(:eq(6))'
                         @endif
-                        },
+                        
+                    },
                     customize: function (win) {
                         $(win.document.body).addClass('bg-white');
                     },
@@ -149,10 +165,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                        @if(permission('session-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(6))'
+                         @if(permission('session-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(7))'
                         @else
-                        columns: ':visible:not(:eq(5))'
+                        columns: ':visible:not(:eq(6))'
                         @endif
                     }
                 },
@@ -163,10 +179,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                        @if(permission('session-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(6))'
+                         @if(permission('session-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(7))'
                         @else
-                        columns: ':visible:not(:eq(5))'
+                        columns: ':visible:not(:eq(6))'
                         @endif
                     }
                 },
@@ -179,14 +195,14 @@
                     "orientation": "landscape", //portrait
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
-                        @if(permission('session-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(6))'
+                         @if(permission('session-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(7))'
                         @else
-                        columns: ':visible:not(:eq(5))'
+                        columns: ':visible:not(:eq(6))'
                         @endif
                     },
                 },
-                @if (permission('session-bulk-delete'))
+                @if (permission('vehicle-bulk-delete'))
                 {
                     'className':'btn btn-danger btn-sm delete_btn d-none text-white',
                     'text':'{{__('file.Delete')}}',
@@ -210,7 +226,7 @@
         $(document).on('click', '#save-btn', function () {
             let form = document.getElementById('store_or_update_form');
             let formData = new FormData(form);
-            let url = "{{route('session.store.or.update')}}";
+            let url = "{{route('vehicle.store.or.update')}}";
             let id = $('#update_id').val();
             let method;
             if (id) {
@@ -228,7 +244,7 @@
             $('#store_or_update_form').find('.error').remove();
             if (id) {
                 $.ajax({
-                    url: "{{route('session.edit')}}",
+                    url: "{{route('vehicle.edit')}}",
                     type: "POST",
                     data: { id: id,_token: _token},
                     dataType: "JSON",
@@ -237,16 +253,15 @@
                             notification(data.status,data.message)
                         }else{
                             $('#store_or_update_form #update_id').val(data.id);
-                            $('#store_or_update_form #session_name').val(data.session_name);
-                            $('#store_or_update_form #session_start').val(data.session_start);
-                            $('#store_or_update_form #session_end').val(data.session_end);
+                            $('#store_or_update_form #name').val(data.name);
+                            $('#store_or_update_form #qty').val(data.qty);
 
                             $('#store_or_update_modal').modal({
                                 keyboard: false,
                                 backdrop: 'static',
                             });
                             $('#store_or_update_modal .modal-title').html(
-                                '<i class="fas fa-edit text-white"></i> <span>Edit ' + data.session_name + '</span>');
+                                '<i class="fas fa-edit text-white"></i> <span>Edit ' + data.group_name + '</span>');
                             $('#store_or_update_modal #save-btn').text('{{__('file.Update')}}');
                         }
 
@@ -262,7 +277,7 @@
             let id    = $(this).data('id');
             let name  = $(this).data('name');
             let row   = table.row($(this).parent('tr'));
-            let url   = "{{ route('session.delete') }}";
+            let url   = "{{ route('vehicle.delete') }}";
             delete_data(id, url, table, row, name);
         });
 
@@ -281,10 +296,19 @@
                     icon: 'warning',
                 });
             }else{
-                let url = "{{route('session.bulk.delete')}}";
+                let url = "{{route('vehicle.bulk.delete')}}";
                 bulk_delete(ids,url,table,rows);
             }
         }
+
+        $(document).on('click', '.change_status', function () {
+            let id     = $(this).data('id');
+            let name   = $(this).data('name');
+            let status = $(this).data('status');
+            let row    = table.row($(this).parent('tr'));
+            let url    = "{{ route('vehicle.change.status') }}";
+            change_status(id, url, table, row, name, status);
+        });
 
 
     });

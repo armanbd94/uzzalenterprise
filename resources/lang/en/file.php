@@ -1632,6 +1632,8 @@ return [
     'Session Name'  => 'Session Name', 
     'Session Start'  => 'Session Start', 
     'Session End'  => 'Session End', 
+    'Add New Session' => 'Add New Session',
+    'Add New Vehicle' => 'Add New Vehicle',
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',

@@ -1619,6 +1619,9 @@ return [
     'Session Name'  => 'সেশনের নাম', 
     'Session Start'  => 'সেশন শুরু', 
     'Session End'  => 'সেশন শেষ', 
+    'Add New Session' => 'নতুন সেশন তৈরি করুন',
+    'Add New Vehicle' => 'নতুন গাড়ি তৈরি করুন',
+
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                              => 'ব্যাপারীর মালামাল উৎপাদন,ডেলিভারী,মিল ভাড়ার রিপোর্ট ',
