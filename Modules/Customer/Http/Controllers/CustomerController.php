@@ -6,13 +6,12 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Customer\Entities\Customer;
-use Modules\Setting\Entities\Warehouse;
 use App\Http\Controllers\BaseController;
 use Modules\Account\Entities\Transaction;
 use Modules\Setting\Entities\CustomerGroup;
 use Modules\Account\Entities\ChartOfAccount;
 use Modules\Customer\Http\Requests\CustomerFormRequest;
-
+use Illuminate\Support\Facades\App;
 
 class CustomerController extends BaseController
 {
@@ -81,17 +80,17 @@ class CustomerController extends BaseController
                     if(permission('customer-bulk-delete')){
                         $row[] = row_checkbox($value->id);//custom helper function to show the table each row checkbox
                     }
-                    $row[] = $no;
+                    $row[] = translate($no,App::getLocale());
                     $row[] = $value->name;
                     $row[] = $value->company_name;
-                    $row[] = $value->mobile;
+                    $row[] = translate($value->mobile,App::getLocale());
                     $row[] = $value->customer_group->group_name;
                     $row[] = $value->email;
                     $row[] = $value->city;
                     $row[] = $value->zipcode;
                     $row[] = $value->address;
                     $row[] = permission('customer-edit') ? change_status($value->id,$value->status, $value->name) : STATUS_LABEL[$value->status];
-                    $row[] = $this->model->customer_balance($value->id);
+                    $row[] = translate(number_format($this->model->customer_balance($value->id),2,'.',','),App::getLocale());
                     $row[] = action_button($action);//custom helper function for action button
                     $data[] = $row;
                 }
@@ -113,36 +112,28 @@ class CustomerController extends BaseController
                     $collection   = $this->track_data($collection,$request->update_id);
                     $customer     = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
                     $output       = $this->store_message($customer, $request->update_id);
-                    if(empty($request->update_id))
+                    if($request->update_id)
                     {
-                        $coa_max_code      = ChartOfAccount::where('level',4)->where('code','like','1020201%')->max('code');
-                        $code              = $coa_max_code ? ($coa_max_code + 1) : $this->coa_head_code('customer_receivable');
-                        $head_name         = $customer->id.'-'.$customer->name;
-                        $customer_coa_data = $this->customer_coa($code,$head_name,$customer->id);
-
-                        $customer_coa      = ChartOfAccount::create($customer_coa_data);
-                        if(!empty($request->previous_balance))
+                        $new_head_name = $request->name;
+                        $customer_coa  = ChartOfAccount::where(['customer_id'=>$request->update_id])->first();
+                        if($customer_coa)
                         {
-                            if($customer_coa){
-                                $this->previous_balance_add($request->previous_balance,$customer_coa->id,$customer->name,$request->warehouse_id);
-                            }
+                            $customer_coa->update(['name'=>$new_head_name]);
+                        }else{
+                            $coa_max_code      = ChartOfAccount::where('level',4)->where('code','like','1020201%')->max('code');
+                            $code              = $coa_max_code ? ($coa_max_code + 1) : '102020100001';
+                            $customer_coa      = ChartOfAccount::create($this->coa_data($code,$new_head_name,$request->update_id));
                         }
                     }else{
 
-                        $old_head_name = $request->update_id.'-'.$request->old_name;
-                        $new_head_name = $request->update_id.'-'.$request->name;
-                        $customer_coa = ChartOfAccount::where(['name'=>$old_head_name,'customer_id'=>$request->update_id])->first();
-                        if($customer_coa)
+                        $coa_max_code      = ChartOfAccount::where('level',4)->where('code','like','1020201%')->max('code');
+                        $code              = $coa_max_code ? ($coa_max_code + 1) : '1020201000001';
+                        $head_name         = $customer->name;
+                        $customer_coa      = ChartOfAccount::create($this->coa_data($code,$head_name,$customer->id));
+                        if(!empty($request->previous_balance))
                         {
-                            $customer_coa_id = $customer_coa->id;
-                            $customer_coa->update(['name'=>$new_head_name]);
-                            if(!empty($request->previous_balance) && !empty($request->old_previous_balance))
-                            {
-                                if($request->previous_balance != $request->old_previous_balance){
-                                    $this->previous_balance_update($request->previous_balance,$customer_coa_id,$request->name);
-                                }
-                            }elseif (!empty($request->previous_balance) && empty($request->old_previous_balance)) {
-                                $this->previous_balance_add($request->previous_balance,$customer_coa_id,$request->name);
+                            if($customer_coa){
+                                Transaction::insert($this->previous_balance_data($request->previous_balance,$customer_coa->id,$customer->name));
                             }
                         }
                     }
@@ -160,7 +151,7 @@ class CustomerController extends BaseController
         }
     }
 
-    private function customer_coa(string $code,string $head_name,int $customer_id)
+    private function coa_data(string $code,string $head_name,int $customer_id)
     {
         return [
             'code'              => $code,
@@ -171,7 +162,6 @@ class CustomerController extends BaseController
             'transaction'       => 1,
             'general_ledger'    => 2,
             'customer_id'       => $customer_id,
-            'supplier_id'       => null,
             'budget'            => 2,
             'depreciation'      => 2,
             'depreciation_rate' => '0',
@@ -180,16 +170,16 @@ class CustomerController extends BaseController
         ];
     }
 
-    private function previous_balance_add($balance, int $customer_coa_id, string $customer_name) {
+    private function previous_balance_data($balance, int $customer_coa_id, string $customer_name) {
         if(!empty($balance) && !empty($customer_coa_id) && !empty($customer_name)){
-            $transaction_id = generator(10);
+            $transaction_id = date('ymdHi').rand(1,99);
             // customer debit for previous balance
             $cosdr = array(
                 'chart_of_account_id' => $customer_coa_id,
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'PR Balance',
                 'voucher_date'        => date("Y-m-d"),
-                'description'         => 'Customer debit For '.$customer_name,
+                'description'         => 'Debit '.$balance.' for old sale from '.$customer_name,
                 'debit'               => $balance,
                 'credit'              => 0,
                 'posted'              => 1,
@@ -202,7 +192,7 @@ class CustomerController extends BaseController
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'PR Balance',
                 'voucher_date'        => date("Y-m-d"),
-                'description'         => 'Inventory credit For Old sale For '.$customer_name,
+                'description'         => 'Inventory credit '.$balance.' for Old sale from '.$customer_name,
                 'debit'               => 0,
                 'credit'              => $balance,
                 'posted'              => 1,
@@ -211,9 +201,9 @@ class CustomerController extends BaseController
                 'created_at'          => date('Y-m-d H:i:s')
             );
 
-            Transaction::insert([
+            return [
                 $cosdr,$inventory
-            ]);
+            ];
         }
     }
 
@@ -338,7 +328,7 @@ class CustomerController extends BaseController
     public function change_status(Request $request)
     {
         if($request->ajax()){
-            if(permission('material-edit')){
+            if(permission('customer-edit')){
                 $result   = $this->model->find($request->id)->update(['status' => $request->status]);
                 $output   = $result ? ['status' => 'success','message' => $this->responseMessage('Status Changed')]
                 : ['status' => 'error','message' => $this->responseMessage('Status Changed Failed')];

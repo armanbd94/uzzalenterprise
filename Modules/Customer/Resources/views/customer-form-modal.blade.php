@@ -26,14 +26,14 @@
                     <x-form.textbox labelName="{{__('file.Email')}}" name="email" type="email" col="col-md-6" placeholder="{{__('file.Enter email address')}}"/>
                     <x-form.selectbox labelName="{{__('file.Customer Group')}}" name="customer_group_id" col="col-md-6" required="required" class="selectpicker">
                       @if (!$customer_groups->isEmpty())
-                          @foreach ($customer_groups as $value)
-                          <option value="{{ $value->id }}">{{ $value->group_name }}</option>
+                          @foreach ($customer_groups as $key =>  $value)
+                          <option value="{{ $value->id }}" {{ $key == 0 ? 'selected' : ''}}>{{ $value->group_name }}</option>
                           @endforeach
                       @endif
                     </x-form.selectbox>
                     <x-form.textbox labelName="{{__('file.City')}}" name="city" col="col-md-6" placeholder="{{__('file.Enter city name')}}"/>
                     <x-form.textbox labelName="{{__('file.Zipcode')}}" name="zipcode" col="col-md-6" placeholder="{{__('file.Enter zipcode')}}"/>
-                    <x-form.textbox labelName="{{__('file.Previous Balance')}}" name="previous_balance" col="col-md-6" placeholder="{{__('file.Previous credit balance')}}"/>
+                    <x-form.textbox labelName="{{__('file.Previous Balance')}}" name="previous_balance" col="col-md-6 pbalance" placeholder="{{__('file.Previous credit balance')}}"/>
                     <x-form.textarea labelName="{{__('file.Customer Address')}}" name="address" col="col-md-6" required="required" placeholder="{{__('file.Enter customer address')}}"/>
 
                 </div>

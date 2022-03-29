@@ -33,7 +33,7 @@
                       <option value="{{ $key }}">{{ $value }}</option>
                       @endforeach
                     </x-form.selectbox>
-                    <x-form.selectbox labelName="{{ __('file.Account') }}" name="account_id" required="required"  col="col-md-12" class="selectpicker"/>
+                    <x-form.selectbox labelName="{{ __('file.Account Head') }}" name="account_id" required="required"  col="col-md-12" class="selectpicker"/>
                     <div class="form-group col-md-12 d-none reference_no">
                         <label for="reference_no">{{ __('file.Reference No.') }}</label>
                         <input type="text" class="form-control" name="reference_no" id="reference_no">

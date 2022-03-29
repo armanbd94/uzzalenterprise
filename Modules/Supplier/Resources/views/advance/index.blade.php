@@ -476,6 +476,7 @@ function showAdvanceFormModal(modal_title, btn_text) {
             $(this).attr('disabled', false);
         });
     });
+    $('.reference_no').addClass('d-none');
     $('#store_or_update_form #account_id').html('');
     $('#store_or_update_form select#supplier').val('');
     $('#store_or_update_form .selectpicker').selectpicker('refresh');

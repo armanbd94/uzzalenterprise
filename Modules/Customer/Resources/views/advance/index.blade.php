@@ -92,6 +92,8 @@
                                         <th>{{__('file.Amount')}}</th>
                                         <th>{{__('file.Approval Status')}}</th>
                                         <th>{{__('file.Date')}}</th>
+                                        <th>{{ __('file.Payment Method') }}</th>
+                                        <th>{{ __('file.Account Name') }}</th>
                                         <th>{{__('file.Action')}}</th>
                                     </tr>
                                 </thead>
@@ -149,7 +151,7 @@
                 "url": "{{route('customer.advance.datatable.data')}}",
                 "type": "POST",
                 "data": function (data) {
-                    data.customer_id = $("#form-filter #customer_id option:selected").val();
+                    data.customer_id = $("#form-filter #customer_id").val();
                     data.type        = $("#form-filter #type").val();
                     data.start_date  = $("#form-filter #start_date").val();
                     data.end_date    = $("#form-filter #end_date").val();
@@ -158,18 +160,18 @@
             },
             "columnDefs": [{
                     @if (permission('customer-advance-bulk-delete'))
-                    "targets": [0,9],
+                    "targets": [0,11],
                     @else
-                    "targets": [8],
+                    "targets": [10],
                     @endif
                     "orderable": false,
                     "className": "text-center"
                 },
                 {
                     @if (permission('customer-advance-bulk-delete'))
-                    "targets": [1,4,5,7,8],
+                    "targets": [1,4,5,7,8,9,10],
                     @else
-                    "targets": [0,3,4,6,7],
+                    "targets": [0,3,4,6,7,8,9],
                     @endif
                     "className": "text-center"
                 },
@@ -188,7 +190,6 @@
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'<'float-right'p>>>",
 
             "buttons": [
-                @if (permission('customer-advance-report'))
                 {
                     'extend':'colvis','className':'btn btn-secondary btn-sm text-white','text':'Column','columns': ':gt(0)'
                 },
@@ -201,9 +202,9 @@
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
                         @if (permission('customer-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(9))'
+                        columns: ':visible:not(:eq(0),:eq(11))'
                         @else
-                        columns: ':visible:not(:eq(8))'
+                        columns: ':visible:not(:eq(10))'
                         @endif
                     },
                     customize: function (win) {
@@ -222,10 +223,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                        @if (permission('customer-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(9))'
+                       @if (permission('customer-advance-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(11))'
                         @else
-                        columns: ':visible:not(:eq(8))'
+                        columns: ':visible:not(:eq(10))'
                         @endif
                     }
                 },
@@ -236,10 +237,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                        @if (permission('customer-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(9))'
+                       @if (permission('customer-advance-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(11))'
                         @else
-                        columns: ':visible:not(:eq(8))'
+                        columns: ':visible:not(:eq(10))'
                         @endif
                     }
                 },
@@ -252,10 +253,10 @@
                     "orientation": "portrait", //portrait
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
-                        @if (permission('customer-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(9))'
+                       @if (permission('customer-advance-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(11))'
                         @else
-                        columns: ':visible:not(:eq(8))'
+                        columns: ':visible:not(:eq(10))'
                         @endif
                     },
                     customize: function(doc) {
@@ -264,7 +265,6 @@
                     doc.pageMargins = [5,5,5,5];
                 }
                 },
-                @endif
                 @if (permission('customer-advance-bulk-delete'))
                 {
                     'className':'btn btn-danger btn-sm delete_btn d-none text-white',
@@ -295,7 +295,12 @@
             var customer_name  = $('#store_or_update_form #customer option:selected').data('name');
             var type           = $('#store_or_update_form #type option:selected').val();
             var amount         = $('#store_or_update_form #amount').val();
-
+            var payment_method = $('#store_or_update_form #payment_method option:selected').val();
+            var account_id    = $('#store_or_update_form #account_id option:selected').val();
+            var reference_no = '';
+            if(payment_method != 1){
+                reference_no = $('#store_or_update_form #reference_no').val();
+            }
             let url = "{{route('customer.advance.store.or.update')}}";
             let id = $('#update_id').val();
             let method;
@@ -308,7 +313,8 @@
             $.ajax({
                 url: url,
                 type: "POST",
-                data: {id:id,customer:customer,customer_coaid:customer_coaid,customer_name:customer_name,type:type,amount:amount,_token:_token},
+                data: {id:id,customer:customer,customer_coaid:customer_coaid,customer_name:customer_name,type:type,amount:amount,
+                    payment_method:payment_method,account_id:account_id,reference_no:reference_no,_token:_token},
                 dataType: "JSON",
                 beforeSend: function(){
                     $('#save-btn').addClass('spinner spinner-white spinner-right');
@@ -365,7 +371,16 @@
                             $('#store_or_update_form #customer').val(data.customer_id);
                             $('#store_or_update_form #type').val(data.type);
                             $('#store_or_update_form #amount').val(data.amount);
-
+                            $('#store_or_update_form #payment_method').val(data.payment_method);
+                            if(data.payment_method != 1){
+                                $('.reference_no').removeClass('d-none');
+                                $('#store_or_update_form #reference_no').val(data.reference_no);
+                            }else{
+                                $('.reference_no').addClass('d-none');
+                                $('#store_or_update_form #reference_no').val('');
+                            }
+                            
+                            account_list(data.payment_method,data.account_id);
                             $('#store_or_update_form select#customer').each(function(){
                                 $('#store_or_update_form select#customer option').each(function() {
                                     if(!this.selected) {
@@ -379,7 +394,7 @@
                                 backdrop: 'static',
                             });
                             $('#store_or_update_modal .modal-title').html(
-                                '<i class="fas fa-edit text-white"></i> <span>Edit ' + data.name + '</span>');
+                                '<i class="fas fa-edit text-white"></i> <span>{{__('file.Edit')}} </span>');
                             $('#store_or_update_modal #save-btn').text('{{__('file.Update')}}');
                         }
                     },
@@ -462,9 +477,38 @@
         }
     });
 
-
+    $(document).on('change', '#payment_method', function () {
+        if($('#payment_method option:selected').val() == 1)
+        {
+            $('.reference_no').addClass('d-none');
+        }else{
+            $('.reference_no').removeClass('d-none');
+        }
+        account_list($('#payment_method option:selected').val());
+    });
 
     });
+    function account_list(payment_method,account_id='')
+{
+    $.ajax({
+        url: "{{route('account.list')}}",
+        type: "POST",
+        data: { payment_method: payment_method,_token: _token},
+        success: function (data) {
+            $('#store_or_update_form #account_id').html('');
+            $('#store_or_update_form #account_id').html(data);
+            $('#store_or_update_form #account_id.selectpicker').selectpicker('refresh');
+            if(account_id)
+            {
+                $('#store_or_update_form #account_id').val(account_id);
+                $('#store_or_update_form #account_id.selectpicker').selectpicker('refresh');
+            }
+        },
+        error: function (xhr, ajaxOption, thrownError) {
+            console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+        }
+    });
+}
     function showAdvanceFormModal(modal_title, btn_text) {
         $('#store_or_update_form')[0].reset();
         $('#store_or_update_form #update_id').val('');
@@ -475,6 +519,8 @@
                 $(this).attr('disabled', false);
             });
         });
+        $('.reference_no').addClass('d-none');
+        $('#store_or_update_form #account_id').html('');
         $('#store_or_update_form select#customer').val('');
         $('#store_or_update_form .selectpicker').selectpicker('refresh');
         $('#store_or_update_modal').modal({

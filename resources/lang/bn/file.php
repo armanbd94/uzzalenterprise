@@ -763,7 +763,7 @@ return [
     "Is General Ledger?"                    => "জেনারেল লেজার কি?",
     "Is Active?"                            => "সক্রিয়?",
     "Add New Account"                       => "নতুন অ্যাকাউন্ট যোগ করুন?",
-    "Account Head"                          => "পেমেন্ট ডেটা সফলভাবে সেভ করা হয়েছে",
+    "Account Head"                          => "অ্যাকাউন্ট হেড",
     "Failed To Save Payment Data"           => "পেমেন্ট ডেটা সফলভাবে সেভ করা হয়েছে",
     "Payment Data Saved Successfully"       => "পেমেন্ট ডেটা সেভ করতে ব্যর্থ",
     "Signature"                             => "স্বাক্ষর",

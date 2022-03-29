@@ -27,9 +27,19 @@
                     </x-form.selectbox>
                     <x-form.selectbox labelName="{{__('file.Advance Type')}}" name="type" required="required"  col="col-md-12" class="selectpicker">
                         <option value="debit">{{__('file.Payment')}}</option>
-                        <option value="credit">{{__('file.Receive')}}</option>
+                        <option value="credit" selected>{{__('file.Receive')}}</option>
                     </x-form.selectbox>
                     <x-form.textbox labelName="{{__('file.Amount')}}" name="amount" required="required" col="col-md-12" placeholder="{{__('file.Enter Amount')}}"/>
+                    <x-form.selectbox labelName="{{ __('file.Payment Method') }}" name="payment_method" required="required"  col="col-md-12" class="selectpicker">
+                      @foreach (PAYMENT_METHOD as $key => $value)
+                      <option value="{{ $key }}">{{ $value }}</option>
+                      @endforeach
+                    </x-form.selectbox>
+                    <x-form.selectbox labelName="{{ __('file.Account Head') }}" name="account_id" required="required"  col="col-md-12" class="selectpicker"/>
+                    <div class="form-group col-md-12 d-none reference_no">
+                        <label for="reference_no">{{ __('file.Reference No.') }}</label>
+                        <input type="text" class="form-control" name="reference_no" id="reference_no">
+                    </div>
 
                 </div>
             </div>

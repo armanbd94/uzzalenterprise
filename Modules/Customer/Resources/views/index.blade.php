@@ -12,7 +12,7 @@
                 <div class="card-toolbar">
                     <!--begin::Button-->
                     @if (permission('customer-add'))
-                    <a href="javascript:void(0);" onclick="showFormModal('{{__('file.Add New Customer')}}','{{__('file.Save')}}')" class="btn btn-primary btn-sm font-weight-bolder">
+                    <a href="javascript:void(0);" onclick="showNewFormModal('{{__('file.Add New Customer')}}','{{__('file.Save')}}')" class="btn btn-primary btn-sm font-weight-bolder">
                         <i class="fas fa-plus-circle"></i> {{__('file.Add New')}}</a>
                     @endif
                     <!--end::Button-->
@@ -170,7 +170,6 @@ $(document).ready(function(){
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'<'float-right'p>>>",
 
         "buttons": [
-            @if (permission('customer-report'))
             {
                 'extend':'colvis','className':'btn btn-secondary btn-sm text-white','text':'{{__('file.Column')}}','columns': ':gt(0)'
             },
@@ -246,7 +245,6 @@ $(document).ready(function(){
                     doc.pageMargins = [5,5,5,5];
                 }
             },
-            @endif
             @if (permission('customer-bulk-delete'))
             {
                 'className':'btn btn-danger btn-sm delete_btn d-none text-white',
@@ -307,7 +305,7 @@ $(document).ready(function(){
                         $('#store_or_update_form #city').val(data.city);
                         $('#store_or_update_form #zipcode').val(data.zipcode);
                         $('#store_or_update_form #address').val(data.address);
-                        $('#store_or_update_form #previous_balance, #store_or_update_form #old_previous_balance').val(data.previous_balance.debit);
+                        $('#store_or_update_form .pbalance').addClass('d-none');
                         $('#store_or_update_form .selectpicker').selectpicker('refresh');
 
                         $('#store_or_update_modal').modal({
@@ -360,5 +358,20 @@ $(document).ready(function(){
         change_status(id, url, table, row, name, status);
     });
 });
+function showNewFormModal(modal_title, btn_text) {
+    $('#store_or_update_form')[0].reset();
+    $('#store_or_update_form #update_id').val('');
+    $('#store_or_update_form').find('.is-invalid').removeClass('is-invalid');
+    $('#store_or_update_form').find('.error').remove();
+    $('#store_or_update_form .selectpicker').selectpicker('refresh');
+    $('#store_or_update_form .pbalance').removeClass('d-none');
+
+    $('#store_or_update_modal').modal({
+        keyboard: false,
+        backdrop: 'static',
+    });
+    $('#store_or_update_modal .modal-title').html('<i class="fas fa-plus-square text-white"></i> '+modal_title);
+    $('#store_or_update_modal #save-btn').text(btn_text);
+}
 </script>
 @endpush

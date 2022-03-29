@@ -58,16 +58,27 @@ class CustomerAdvanceController extends BaseController
                         $action .= ' <a class="dropdown-item change_status"  data-id="' . $value->voucher_no . '" data-name="' . $value->voucher_no . '" data-status="'.$value->approve.'">'.$this->actionButton('Change Status').'</a>';
                     }
                 }
+                $account = $this->account_data($value->voucher_no);
+
+                if($account->coa->parent_name == 'Cash & Cash Equivalent'){
+                    $payment_method = 'Cash';
+                }elseif ($account->coa->parent_name == 'Cash At Bank') {
+                    $payment_method = 'Cheque';
+                }elseif ($account->coa->parent_name == 'Cash At Mobile Bank') {
+                    $payment_method = 'Mobile Bank';
+                }
                 $row = [];
                 $row[] = row_checkbox($value->voucher_no);
                 $row[] = $no;
-                $row[] = $value->customer_name.' - '.$value->mobile;
+                $row[] = $value->customer_name.'<br><b>Mobile No. </b>'.$value->mobile;
                 $row[] = $value->address;
                 $row[] = $value->city;
-                $row[] = ($value->debit != 0) ? 'Payment' : 'Receive' ;
+                $row[] = ($value->debit != 0) ? 'Receive' : 'Payment' ;
                 $row[] = ($value->debit != 0) ? number_format($value->debit,2,'.',',') : number_format($value->credit,2,'.',',');
                 $row[] = APPROVE_STATUS_LABEL[$value->approve];
-                $row[] = date(config('settings.date_format'),strtotime($value->created_at));
+                $row[] = date('d-m-Y',strtotime($value->created_at));
+                $row[] = $payment_method;
+                $row[] = $account->coa->name;
                 $row[] = action_button($action);//custom helper function for action button
                 $data[] = $row;
             }
@@ -79,16 +90,22 @@ class CustomerAdvanceController extends BaseController
         }
     }
 
+    private function account_data(string $voucher_no) : object
+    {
+        return $this->model->with('coa')->where('voucher_no',$voucher_no)->orderBy('id','desc')->first();
+
+    }
+
     public function store_or_update_data(CustomerAdvanceFormRequest $request)
     {
         if($request->ajax()){
             DB::beginTransaction();
             try {
                 if(empty($request->id)){
-                    $result = $this->advance_add($request->type,$request->amount,$request->customer_coaid,$request->customer_name);
+                    $result = $this->advance_add($request->type,$request->amount,$request->customer_coaid,$request->customer_name,$request->payment_method,$request->account_id,$request->reference_no);
                     $output = $this->store_message($result, $request->id);
                 }else{
-                    $result = $this->advance_update($request->id,$request->type,$request->amount,$request->customer_coaid,$request->customer_name);
+                    $result = $this->advance_update($request->id,$request->type,$request->amount,$request->customer_coaid,$request->customer_name,$request->payment_method,$request->account_id,$request->reference_no);
                     $output = $this->store_message($result, $request->id);
                 }
                 DB::commit();
@@ -102,7 +119,7 @@ class CustomerAdvanceController extends BaseController
         }
     }
 
-    private function advance_add(string $type, $amount, int $customer_coa_id, string $customer_name) {
+    private function advance_add(string $type, $amount, int $customer_coa_id, string $customer_name, int $payment_method, int $account_id, string $reference_no = null) {
         if(!empty($type) && !empty($amount) && !empty($customer_coa_id) && !empty($customer_name)){
             $transaction_id = generator(10);
 
@@ -111,7 +128,7 @@ class CustomerAdvanceController extends BaseController
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'Advance',
                 'voucher_date'        => date("Y-m-d"),
-                'description'         => 'Customer Advance For '.$customer_name,
+                'description'         => 'Customer Advance from '.$customer_name,
                 'debit'               => ($type == 'debit') ? $amount : 0,
                 'credit'              => ($type == 'credit') ? $amount : 0,
                 'posted'              => 1,
@@ -119,14 +136,21 @@ class CustomerAdvanceController extends BaseController
                 'created_by'          => auth()->user()->name,
                 'created_at'          => date('Y-m-d H:i:s')
             );
+            if($payment_method == 1){
+                $note = 'Cash in Hand For '.$customer_name;
+            }elseif ($payment_method == 2) {
+                $note = $reference_no;
+            }else{
+                $note = 'Cash at Mobile Bank For '.$customer_name;
+            }
             $cc = array(
-                'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('cash_in_hand'))->value('id'),
+                'chart_of_account_id' => $account_id,
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'Advance',
                 'voucher_date'        => date("Y-m-d"),
-                'description'         => 'Cash in Hand For '.$customer_name.' Advance',
-                'debit'               => ($type == 'debit') ? $amount : 0,
-                'credit'              => ($type == 'credit') ? $amount : 0,
+                'description'         => $note,
+                'debit'               => ($type == 'credit') ? $amount : 0,
+                'credit'              => ($type == 'debit') ? $amount : 0,
                 'posted'              => 1,
                 'approve'             => 3,
                 'created_by'          => auth()->user()->name,
@@ -139,7 +163,7 @@ class CustomerAdvanceController extends BaseController
         }
     }
 
-    private function advance_update(int $transaction_id, string $type, $amount, int $customer_coa_id, string $customer_name) {
+    private function advance_update(int $transaction_id, string $type, $amount, int $customer_coa_id, string $customer_name, int $payment_method, int $account_id, string $reference_no = null) {
         if(!empty($type) && !empty($amount) && !empty($customer_coa_id) && !empty($customer_name)){
 
             $customer_advance_data = $this->model->find($transaction_id);
@@ -147,7 +171,7 @@ class CustomerAdvanceController extends BaseController
             $voucher_no = $customer_advance_data->voucher_no;
 
             $updated = $customer_advance_data->update([
-                'description'         => 'Supplier Advance For '.$customer_name,
+                'description'         => 'Customer Advance from '.$customer_name,
                 'debit'               => ($type == 'debit') ? $amount : 0,
                 'credit'              => ($type == 'credit') ? $amount : 0,
                 'modified_by'         => auth()->user()->name,
@@ -155,16 +179,26 @@ class CustomerAdvanceController extends BaseController
             ]);
             if($updated)
             {
-                $this->model->where([
-                    'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('cash_in_hand'))->value('id'),
-                    'voucher_no'=> $voucher_no])
-                    ->update([
-                        'description'         => 'Cash in Hand For '.$customer_name.' Advance',
-                        'debit'               => ($type == 'debit') ? $amount : 0,
-                        'credit'              => ($type == 'credit') ? $amount : 0,
+                if($payment_method == 1){
+                    $note = 'Cash in Hand For '.$customer_name;
+                }elseif ($payment_method == 2) {
+                    $note = $reference_no;
+                }else{
+                    $note = 'Cash at Mobile Bank For '.$customer_name;
+                }
+                $account = $this->model->where('voucher_no', $voucher_no)->orderBy('id','desc')->first();
+                if($account){
+                    $account->update([
+                        'chart_of_account_id' => $account_id,
+                        'description'         => $note,
+                        'debit'               => ($type == 'credit') ? $amount : 0,
+                        'credit'              => ($type == 'debit') ? $amount : 0,
                         'modified_by'         => auth()->user()->name,
                         'updated_at'          => date('Y-m-d H:i:s')
                     ]);
+                   
+                }
+
                 return true;
             }else{
                 return false;
@@ -178,8 +212,16 @@ class CustomerAdvanceController extends BaseController
         if($request->ajax()){
             $data   = $this->model->select('transactions.*','coa.id as coa_id','coa.code','c.id as customer_id')
             ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
-            ->join('customers as c','coa.customer_id','c.id')->where('transactions.id',$request->id)->first();
-
+            ->join('customers as c','coa.customer_id','c.id')
+            ->where('transactions.id',$request->id)->first();
+            $account = $this->account_data($data->voucher_no);
+            if($account->coa->parent_name == 'Cash & Cash Equivalent'){
+                $payment_method = 1;
+            }elseif ($account->coa->parent_name == 'Cash At Bank') {
+                $payment_method = 2;
+            }elseif ($account->coa->parent_name == 'Cash At Mobile Bank') {
+                $payment_method = 3;
+            }
             $output = []; //if data found then it will return data otherwise return error message
             if($data){
                 $output = [
@@ -187,6 +229,9 @@ class CustomerAdvanceController extends BaseController
                     'customer_id' => $data->customer_id,
                     'type'        => ($data->debit != 0) ? 'debit' : 'credit',
                     'amount'      => ($data->debit != 0) ? $data->debit : $data->credit,
+                    'payment_method' => $payment_method,
+                    'account_id'     => $account->chart_of_account_id,
+                    'reference_no'      => ($payment_method != 1) ? $account->description : ''
                 ];
             }
             return response()->json($output);

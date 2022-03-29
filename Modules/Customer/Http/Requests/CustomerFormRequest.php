@@ -17,7 +17,7 @@ class CustomerFormRequest extends FormRequest
     {
         $this->rules['name']              = ['required','string','max:100'];
         $this->rules['company_name']         = ['nullable','string','max:100'];
-        $this->rules['mobile']            = ['required','string','max:15','unique:customers,mobile'];
+        $this->rules['mobile']            = ['required','string','unique:customers,mobile'];
         $this->rules['email']             = ['nullable','email','string','max:100','unique:customers,email'];
         $this->rules['customer_group_id'] = ['required'];
         $this->rules['city']       = ['nullable','string'];
@@ -26,7 +26,7 @@ class CustomerFormRequest extends FormRequest
         $this->rules['previous_balance']  = ['nullable','numeric'];
 
         if(request()->update_id){
-            $this->rules['mobile'][3] = 'unique:customers,mobile,'.request()->update_id;
+            $this->rules['mobile'][2] = 'unique:customers,mobile,'.request()->update_id;
             $this->rules['email'][4]  = 'unique:customers,email,'.request()->update_id;
         }
         return $this->rules;

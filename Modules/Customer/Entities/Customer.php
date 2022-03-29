@@ -40,7 +40,7 @@ class Customer extends BaseModel
         {
             $balance = $data->balance ? $data->balance : 0;
         }
-        return number_format($balance,2,'.',',');
+        return $balance;
     }
     /******************************************
      * * * Begin :: Custom Datatable Code * * *

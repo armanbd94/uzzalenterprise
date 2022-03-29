@@ -241,7 +241,7 @@ class SupplierAdvanceController extends BaseController
                         'amount'      => ($data->debit != 0) ? $data->debit : $data->credit,
                         'payment_method' => $payment_method,
                         'account_id'     => $account->chart_of_account_id,
-                        'reference_no'      => ($payment_method == 2) ? $account->description : ''
+                        'reference_no'      => ($payment_method != 1) ? $account->description : ''
                     ];
                 }
             }else{
