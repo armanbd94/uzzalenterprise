@@ -24,13 +24,9 @@
                     <x-form.textbox labelName="{{__('file.Company Name')}}" name="company_name" col="col-md-6" placeholder="{{__('file.Enter company name')}}"/>
                     <x-form.textbox labelName="{{__('file.Mobile')}}" name="mobile" required="required" col="col-md-6" placeholder="{{__('file.Enter mobile number')}}"/>
                     <x-form.textbox labelName="{{__('file.Email')}}" name="email" type="email" col="col-md-6" placeholder="{{__('file.Enter email address')}}"/>
-                    <x-form.selectbox labelName="{{__('file.Supplier Type')}}" name="type" col="col-md-6" required="required" class="selectpicker">
-                      <option value="1">Material</option>
-                      <option value="2">Machine</option>
-                    </x-form.selectbox>
                     <x-form.textbox labelName="{{__('file.City')}}" name="city" col="col-md-6" placeholder="{{__('file.Enter city name')}}"/>
                     <x-form.textbox labelName="{{__('file.Zip Code')}}" name="zipcode" col="col-md-6" placeholder="{{__('file.Enter zip code')}}"/>
-                    <x-form.textbox labelName="{{__('file.Previous Balance')}}" name="previous_balance" col="col-md-6" class="text-right" placeholder="{{__('file.Previous Balance')}}"/>
+                    <x-form.textbox labelName="{{__('file.Previous Balance')}}" name="previous_balance" col="col-md-6 pbalance d-none" class="text-right" placeholder="{{__('file.Previous Balance')}}"/>
                     <x-form.textarea labelName="{{__('file.Supplier Address')}}" name="address" col="col-md-6" placeholder="{{__('file.Enter supplier address')}}"/>
                 </div>
             </div>

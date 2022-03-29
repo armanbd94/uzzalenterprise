@@ -33,8 +33,8 @@
                             @endif
                         </x-form.selectbox>
                         <x-form.selectbox labelName="{{__('file.Advance Type')}}" name="type" col="col-md-3" class="selectpicker">
-                            <option value="debit">Payment</option>
-                            <option value="credit">Receive</option>
+                            <option value="credit">{{ __('file.Payment') }}</option>
+                            <option value="debit">{{ __('file.Receive') }}</option>
                         </x-form.selectbox>
                         <div class="col-md-6">
                             <div style="margin-top:28px;">
@@ -73,7 +73,9 @@
                                         <th>{{__('file.Amount')}}</th>
                                         <th>{{__('file.Approval Status')}}</th>
                                         <th>{{__('file.Date')}}</th>
-                                        <th>{{__('file.Action')}}</th>
+                                        <th>{{ __('file.Payment Method') }}</th>
+                                        <th>{{ __('file.Account Name') }}</th>
+                                        <th>{{ __('file.Action')}}</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -92,8 +94,8 @@
 @endsection
 @push('scripts')
 <script>
-    var table;
-    $(document).ready(function(){
+var table;
+$(document).ready(function(){
         table = $('#dataTable').DataTable({
             "processing": true, //Feature control the processing indicator
             "serverSide": true, //Feature control DataTable server side processing mode
@@ -116,7 +118,7 @@
                 "url": "{{route('supplier.advance.datatable.data')}}",
                 "type": "POST",
                 "data": function (data) {
-                    data.supplier_id = $("#form-filter #supplier_id option:selected").val();
+                    data.supplier_id = $("#form-filter #supplier_id").val();
                     data.type        = $("#form-filter #type").val();
                     data._token      = _token;
                 }
@@ -124,18 +126,18 @@
             "columnDefs": [{
 
                     @if (permission('supplier-advance-bulk-delete'))
-                    "targets": [0,7],
+                    "targets": [0,9],
                     @else
-                    "targets": [6],
+                    "targets": [8],
                     @endif
                     "orderable": false,
                     "className": "text-center"
                 },
                 {
                     @if (permission('supplier-advance-bulk-delete'))
-                    "targets": [1,3,5,6],
+                    "targets": [1,3,5,6,7],
                     @else
-                    "targets": [0,2,4,5],
+                    "targets": [0,2,4,5,6],
                     @endif
                     "className": "text-center"
                 },
@@ -153,7 +155,6 @@
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'<'float-right'p>>>",
 
             "buttons": [
-                @if (permission('supplier-advance-report'))
                 {
                     'extend':'colvis','className':'btn btn-secondary btn-sm text-white','text':'{{__('file.Column')}}','columns': ':gt(0)'
                 },
@@ -166,9 +167,9 @@
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
                         @if (permission('supplier-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(7))'
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(6))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     },
                     customize: function (win) {
@@ -183,9 +184,9 @@
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
                         @if (permission('supplier-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(7))'
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(6))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     }
                 },
@@ -197,9 +198,9 @@
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
                         @if (permission('supplier-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(7))'
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(6))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     }
                 },
@@ -213,9 +214,9 @@
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
                         @if (permission('supplier-advance-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(7))'
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(6))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     },
                     customize: function(doc) {
@@ -224,7 +225,6 @@
                         doc.pageMargins = [5,5,5,5];
                     }
                 },
-                @endif
                 @if (permission('supplier-advance-bulk-delete'))
                 {
                     'className':'btn btn-danger btn-sm delete_btn d-none text-white',
@@ -253,7 +253,12 @@
             var supplier_name  = $('#store_or_update_form #supplier option:selected').data('name');
             var type           = $('#store_or_update_form #type option:selected').val();
             var amount         = $('#store_or_update_form #amount').val();
-
+            var payment_method = $('#store_or_update_form #payment_method option:selected').val();
+            var account_id    = $('#store_or_update_form #account_id option:selected').val();
+            var reference_no = '';
+            if(payment_method != 1){
+                reference_no = $('#store_or_update_form #reference_no').val();
+            }
             let url = "{{route('supplier.advance.store.or.update')}}";
             let id = $('#update_id').val();
             let method;
@@ -266,7 +271,8 @@
             $.ajax({
                 url: url,
                 type: "POST",
-                data: {id:id,supplier:supplier,supplier_coaid:supplier_coaid,supplier_name:supplier_name,type:type,amount:amount,_token:_token},
+                data: {id:id,supplier:supplier,supplier_coaid:supplier_coaid,supplier_name:supplier_name,type:type,amount:amount,
+                    payment_method:payment_method,account_id:account_id,reference_no:reference_no,_token:_token},
                 dataType: "JSON",
                 beforeSend: function(){
                     $('#save-btn').addClass('spinner spinner-white spinner-right');
@@ -323,7 +329,16 @@
                             $('#store_or_update_form #supplier').val(data.supplier_id);
                             $('#store_or_update_form #type').val(data.type);
                             $('#store_or_update_form #amount').val(data.amount);
-
+                            $('#store_or_update_form #payment_method').val(data.payment_method);
+                            if(data.payment_method != 1){
+                                $('.reference_no').removeClass('d-none');
+                                $('#store_or_update_form #reference_no').val(data.reference_no);
+                            }else{
+                                $('.reference_no').addClass('d-none');
+                                $('#store_or_update_form #reference_no').val('');
+                            }
+                            
+                            account_list(data.payment_method,data.account_id);
                             $('#store_or_update_form select#supplier').each(function(){
                                 $('#store_or_update_form select#supplier option').each(function() {
                                     if(!this.selected) {
@@ -337,7 +352,7 @@
                                 backdrop: 'static',
                             });
                             $('#store_or_update_modal .modal-title').html(
-                                '<i class="fas fa-edit text-white"></i> <span>{{__('file.Edit')}} ' + data.name + '</span>');
+                                '<i class="fas fa-edit text-white"></i> <span>{{__('file.Edit')}}</span>');
                             $('#store_or_update_modal #save-btn').text('{{__('file.Update')}}');
                         }
                     },
@@ -376,8 +391,8 @@
             }
         }
 
-     //Show Status Change Modal
-     $(document).on('click','.change_status',function(){
+    //Show Status Change Modal
+    $(document).on('click','.change_status',function(){
         $('#approve_status_form #approve_id').val($(this).data('id'));
         $('#approve_status_form #approval_status').val($(this).data('status'));
         $('#approve_status_form #approval_status.selectpicker').selectpicker('refresh');
@@ -419,26 +434,57 @@
             });
         }
     });
-
+    $(document).on('change', '#payment_method', function () {
+        if($('#payment_method option:selected').val() == 1)
+        {
+            $('.reference_no').addClass('d-none');
+        }else{
+            $('.reference_no').removeClass('d-none');
+        }
+        account_list($('#payment_method option:selected').val());
     });
-    function showAdvanceFormModal(modal_title, btn_text) {
-        $('#store_or_update_form')[0].reset();
-        $('#store_or_update_form #update_id').val('');
-        $('#store_or_update_form').find('.is-invalid').removeClass('is-invalid');
-        $('#store_or_update_form').find('.error').remove();
-        $('#store_or_update_form select#supplier').each(function(){
-            $('#store_or_update_form select#supplier option').each(function() {
-                $(this).attr('disabled', false);
-            });
+
+});
+function account_list(payment_method,account_id='')
+{
+    $.ajax({
+        url: "{{route('account.list')}}",
+        type: "POST",
+        data: { payment_method: payment_method,_token: _token},
+        success: function (data) {
+            $('#store_or_update_form #account_id').html('');
+            $('#store_or_update_form #account_id').html(data);
+            $('#store_or_update_form #account_id.selectpicker').selectpicker('refresh');
+            if(account_id)
+            {
+                $('#store_or_update_form #account_id').val(account_id);
+                $('#store_or_update_form #account_id.selectpicker').selectpicker('refresh');
+            }
+        },
+        error: function (xhr, ajaxOption, thrownError) {
+            console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+        }
+    });
+}
+function showAdvanceFormModal(modal_title, btn_text) {
+    $('#store_or_update_form')[0].reset();
+    $('#store_or_update_form #update_id').val('');
+    $('#store_or_update_form').find('.is-invalid').removeClass('is-invalid');
+    $('#store_or_update_form').find('.error').remove();
+    $('#store_or_update_form select#supplier').each(function(){
+        $('#store_or_update_form select#supplier option').each(function() {
+            $(this).attr('disabled', false);
         });
-        $('#store_or_update_form select#supplier').val('');
-        $('#store_or_update_form .selectpicker').selectpicker('refresh');
-        $('#store_or_update_modal').modal({
-            keyboard: false,
-            backdrop: 'static',
-        });
-        $('#store_or_update_modal .modal-title').html('<i class="fas fa-plus-square text-white"></i> '+modal_title);
-        $('#store_or_update_modal #save-btn').text(btn_text);
-    }
-    </script>
+    });
+    $('#store_or_update_form #account_id').html('');
+    $('#store_or_update_form select#supplier').val('');
+    $('#store_or_update_form .selectpicker').selectpicker('refresh');
+    $('#store_or_update_modal').modal({
+        keyboard: false,
+        backdrop: 'static',
+    });
+    $('#store_or_update_modal .modal-title').html('<i class="fas fa-plus-square text-white"></i> '+modal_title);
+    $('#store_or_update_modal #save-btn').text(btn_text);
+}
+</script>
 @endpush

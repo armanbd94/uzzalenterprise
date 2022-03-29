@@ -16,7 +16,9 @@ class SupplierAdvanceFormRequest extends FormRequest
         return [
             'supplier' => 'required',
             'type'     => 'required',
-            'amount'   => 'required|numeric|gt:0'
+            'amount'   => 'required|numeric|gt:0',
+            'payment_method' => 'required',
+            'account_id'     => 'required'
         ];
     }
 

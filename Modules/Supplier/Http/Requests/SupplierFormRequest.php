@@ -21,7 +21,6 @@ class SupplierFormRequest extends FormRequest
         $rulse['zipcode']          = ['nullable','string'];
         $rulse['address']          = ['nullable','string'];
         $rulse['previous_balance'] = ['nullable','numeric'];
-        $rulse['type']             = ['required','integer'];
 
         if(request()->update_id){
             $rulse['mobile'][3]           = 'unique:suppliers,mobile,'.request()->update_id;

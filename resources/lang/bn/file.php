@@ -1622,6 +1622,7 @@ return [
     'Session End'  => 'সেশন শেষ', 
     'Add New Session' => 'নতুন সেশন তৈরি করুন',
     'Add New Vehicle' => 'নতুন গাড়ি তৈরি করুন',
+    'Reference No.'  => 'রেফারেন্স নং',
 
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',
@@ -1651,5 +1652,5 @@ return [
     'Paid amount cannot be bigger than net total amount'                                            => 'প্রদত্ত পরিমাণ মোট, মোট পরিমাণের চেয়ে বড় হতে পারে না',
     'Selected Data Has Been Delete Successfully'                                                    => 'নির্বাচিত ডেটা সফলভাবে মুছে ফেলা হয়েছে',
     'Failed To Delete Selected Data'                                                                => 'নির্বাচিত ডেটা মুছে ফেলতে ব্যর্থ',
-    'This session cannot delete because it is default session'                                     => 'এই সেশন ডাটা ডিলিট করা যাবে না কারন এটা সিস্টেম এর ডিফল্ট সেশন'
+    'This session cannot delete because it is default session'                                      => 'এই সেশন ডাটা ডিলিট করা যাবে না কারন এটা সিস্টেম এর ডিফল্ট সেশন'
 ];

@@ -111,7 +111,7 @@ define('PAYMENT_STATUS_LABEL',[
     '2'=>'<span class="label label-info label-pill label-inline" style="min-width:70px !important;">Partial</span>',
     '3'=>'<span class="label label-danger label-pill label-inline" style="min-width:70px !important;">Due</span>',
 ]);
-define('PAYMENT_METHOD',['1'=>'Cash','2'=>'Cheque','3'=>'Mobile Bank']);
+define('PAYMENT_METHOD',['1'=>'Cash','2'=>'Bank','3'=>'Mobile Bank']);
 define('SALE_PAYMENT_METHOD',['1'=>'Cash','2'=>'Bank','3'=>'Mobile Bank']);
 define('DELIVERY_STATUS',['1'=>'Pending','2'=>'Partially Delivered','3'=>'Delivered']);
 define('MAIL_MAILER',(['smtp','sendmail','mail']));

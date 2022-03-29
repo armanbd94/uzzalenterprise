@@ -10,7 +10,7 @@ use Modules\Account\Entities\ChartOfAccount;
 
 class Supplier extends BaseModel
 {
-    protected $fillable = [ 'name', 'company_name', 'mobile', 'email', 'phone', 'city', 'zipcode', 'address', 'type','status', 'created_by', 'modified_by'];
+    protected $fillable = [ 'name', 'company_name', 'mobile', 'email', 'phone', 'city', 'zipcode', 'address', 'status', 'created_by', 'modified_by'];
 
     public function coa(){
         return $this->hasOne(ChartOfAccount::class,'supplier_id','id');
@@ -33,7 +33,7 @@ class Supplier extends BaseModel
         {
             $balance = $data->balance ? $data->balance : 0;
         }
-        return number_format($balance,2,'.',',');
+        return $balance;
     }
 
     /******************************************
@@ -43,7 +43,6 @@ class Supplier extends BaseModel
     protected $_name; 
     protected $_mobile; 
     protected $_email; 
-    protected $_type; 
     protected $_status; 
 
     //methods to set custom search property value
@@ -63,19 +62,14 @@ class Supplier extends BaseModel
     {
         $this->_status = $status;
     }
-    public function setType($type)
-    {
-        $this->_type = $type;
-    }
-
 
     private function get_datatable_query()
     {
         //set column sorting index table column name wise (should match with frontend table header)
         if (permission('supplier-bulk-delete')){
-            $this->column_order = [null,'id','name', 'address','mobile', 'email', 'city', 'country', 'type','status', null, null];
+            $this->column_order = [null,'id','name', 'address', 'city', 'country', 'status', null, null];
         }else{
-            $this->column_order = ['id','name', 'address','mobile', 'email', 'city', 'country', 'type','status', null, null];
+            $this->column_order = ['id','name', 'address', 'city', 'country', 'status', null, null];
         }
         
         $query = self::toBase();
@@ -92,9 +86,6 @@ class Supplier extends BaseModel
         }
         if (!empty($this->_status)) {
             $query->where('status', $this->_status);
-        }
-        if (!empty($this->_type)) {
-            $query->where('type', $this->_type);
         }
 
         //order by data fetching code
@@ -149,33 +140,16 @@ class Supplier extends BaseModel
     * * *  Begin :: Cache Data * * *
     **************************************/
     protected const ALL_SUPPLIERS    = '_suppliers';
-    protected const ACTIVE_MATERIAL_SUPPLIERS = '_active_machine_suppliers';
-    protected const ACTIVE_MACHINE_SUPPLIERS = '_active_machine_suppliers';
 
     public static function allSuppliers(){
         return Cache::rememberForever(self::ALL_SUPPLIERS, function () {
-            return self::toBase()->orderBy('name','asc')->get();
+            return self::toBase()->active()->orderBy('name','asc')->get();
         });
     }
-
-    public static function activeMaterialSuppliers(){
-        return Cache::rememberForever(self::ACTIVE_MATERIAL_SUPPLIERS, function () {
-            return self::where(['type'=>1,'status'=>1])->orderBy('name','asc')->get();
-        });
-    }
-    public static function activeMachineSuppliers(){
-        return Cache::rememberForever(self::ACTIVE_MACHINE_SUPPLIERS, function () {
-            return self::where(['type'=>2,'status'=>1])->orderBy('name','asc')->get();
-        });
-    }
-
 
     public static function flushCache(){
         Cache::forget(self::ALL_SUPPLIERS);
-        Cache::forget(self::ACTIVE_MATERIAL_SUPPLIERS);
-        Cache::forget(self::ACTIVE_MACHINE_SUPPLIERS);
     }
-
 
     public static function boot(){
         parent::boot();

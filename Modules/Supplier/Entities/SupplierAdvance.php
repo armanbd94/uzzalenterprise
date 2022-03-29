@@ -28,17 +28,17 @@ class SupplierAdvance extends BaseModel
      * * * Begin :: Custom Datatable Code * * *
     *******************************************/
     //custom search column property
-    protected $supplier_id; 
-    protected $type; 
+    protected $_supplier_id; 
+    protected $_type; 
 
     //methods to set custom search property value
     public function setSupplierID($supplier_id)
     {
-        $this->supplier_id = $supplier_id;
+        $this->_supplier_id = $supplier_id;
     }
     public function setType($type)
     {
-        $this->type = $type;
+        $this->_type = $type;
     }
 
     private function get_datatable_query()
@@ -50,17 +50,20 @@ class SupplierAdvance extends BaseModel
             $this->column_order = ['transactions.id','s.name', null,null,'transactions.created_at',null];
         }
         
-        $query = self::select('transactions.*','coa.id as coa_id','coa.code','s.id as supplier_id','s.name','s.mobile')->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
-        ->join('suppliers as s','coa.supplier_id','s.id')->where('transactions.voucher_type',self::TYPE);
+        $query = self::select('transactions.*','coa.id as coa_id','coa.code','s.id as supplier_id',
+        's.name','s.mobile','coa.name as account_name','coa.parent_name')
+        ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
+        ->join('suppliers as s','coa.supplier_id','s.id')
+        ->where('transactions.voucher_type',self::TYPE);
 
         //search query
-        if (!empty($this->supplier_id)) {
-            $query->where('s.id', $this->supplier_id);
+        if (!empty($this->_supplier_id)) {
+            $query->where('s.id', $this->_supplier_id);
         }
-        if (!empty($this->type) && $this->type == 'debit') {
+        if (!empty($this->_type) && $this->_type == 'debit') {
             $query->where('transactions.debit', '!=',0);
         }
-        if (!empty($this->type) && $this->type == 'credit') {
+        if (!empty($this->_type) && $this->_type == 'credit') {
             $query->where('transactions.credit', '!=',0);
         }
 
@@ -91,7 +94,9 @@ class SupplierAdvance extends BaseModel
     public function count_all()
     {
         return self::select('transactions.*','coa.id as coa_id','coa.code','s.id as supplier_id','s.name','s.mobile')->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
-        ->join('suppliers as s','coa.supplier_id','s.id')->where('transactions.voucher_type',self::TYPE)->get()->count();
+        ->join('suppliers as s','coa.supplier_id','s.id')
+        ->where('transactions.voucher_type',self::TYPE)
+        ->get()->count();
     }
     /******************************************
      * * * End :: Custom Datatable Code * * *
