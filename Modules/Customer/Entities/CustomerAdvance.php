@@ -63,7 +63,8 @@ class CustomerAdvance extends BaseModel
         'coa.id as coa_id','coa.code','c.id as customer_id','c.name as customer_name','c.mobile','c.address','c.city')
         ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('customers as c','coa.customer_id','c.id')
-        ->where(['transactions.voucher_type'=>self::TYPE]);
+        ->where(['transactions.voucher_type'=>self::TYPE])
+        ->whereBetween('transactions.voucher_date',[config('settings.session_start'),config('settings.session_end')]);
 
         //search query
         if (!empty($this->customer_id)) {
@@ -113,7 +114,9 @@ class CustomerAdvance extends BaseModel
         'coa.id as coa_id','coa.code','c.id as customer_id','c.name as customer_name','c.mobile','c.address','c.city')
         ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('customers as c','coa.customer_id','c.id')
-        ->where(['transactions.voucher_type'=>self::TYPE])->get()->count();
+        ->where(['transactions.voucher_type'=>self::TYPE])
+        ->whereBetween('transactions.voucher_date',[config('settings.session_start'),config('settings.session_end')])
+        ->get()->count();
     }
     /******************************************
      * * * End :: Custom Datatable Code * * *

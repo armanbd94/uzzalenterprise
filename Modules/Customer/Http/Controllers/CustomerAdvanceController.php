@@ -9,7 +9,7 @@ use Modules\Customer\Entities\Customer;
 use App\Http\Controllers\BaseController;
 use Modules\Customer\Entities\CustomerAdvance;
 use Modules\Customer\Http\Requests\CustomerAdvanceFormRequest;
-
+use Illuminate\Support\Facades\App;
 
 class CustomerAdvanceController extends BaseController
 {
@@ -69,14 +69,14 @@ class CustomerAdvanceController extends BaseController
                 }
                 $row = [];
                 $row[] = row_checkbox($value->voucher_no);
-                $row[] = $no;
-                $row[] = $value->customer_name.'<br><b>Mobile No. </b>'.$value->mobile;
+                $row[] = translate($no,App::getLocale());
+                $row[] = $value->customer_name.'<br><b>Mobile No. </b>'.translate($value->mobile,App::getLocale());
                 $row[] = $value->address;
                 $row[] = $value->city;
                 $row[] = ($value->debit != 0) ? 'Receive' : 'Payment' ;
-                $row[] = ($value->debit != 0) ? number_format($value->debit,2,'.',',') : number_format($value->credit,2,'.',',');
+                $row[] = ($value->debit != 0) ? translate(number_format($value->debit,2,'.',','),App::getLocale()) : translate(number_format($value->credit,2,'.',','),App::getLocale());
                 $row[] = APPROVE_STATUS_LABEL[$value->approve];
-                $row[] = date('d-m-Y',strtotime($value->created_at));
+                $row[] = translate(date('d-m-Y',strtotime($value->created_at)),App::getLocale());
                 $row[] = $payment_method;
                 $row[] = $account->coa->name;
                 $row[] = action_button($action);//custom helper function for action button

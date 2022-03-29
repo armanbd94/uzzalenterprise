@@ -54,7 +54,8 @@ class SupplierAdvance extends BaseModel
         's.name','s.mobile','coa.name as account_name','coa.parent_name')
         ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('suppliers as s','coa.supplier_id','s.id')
-        ->where('transactions.voucher_type',self::TYPE);
+        ->where('transactions.voucher_type',self::TYPE)
+        ->whereBetween('transactions.voucher_date',[config('settings.session_start'),config('settings.session_end')]);
 
         //search query
         if (!empty($this->_supplier_id)) {
@@ -96,6 +97,7 @@ class SupplierAdvance extends BaseModel
         return self::select('transactions.*','coa.id as coa_id','coa.code','s.id as supplier_id','s.name','s.mobile')->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('suppliers as s','coa.supplier_id','s.id')
         ->where('transactions.voucher_type',self::TYPE)
+        ->whereBetween('transactions.voucher_date',[config('settings.session_start'),config('settings.session_end')])
         ->get()->count();
     }
     /******************************************

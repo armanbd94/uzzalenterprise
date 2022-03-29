@@ -143,7 +143,10 @@ class CompanySessionController extends BaseController
 
     public function sessionSwitch($id)
     {
+        $session = CompanySession::find($id);
         Setting::set('active_session_id',$id);
+        Setting::set('session_start',$session->session_start);
+        Setting::set('session_end',$session->session_end);
         return redirect()->back()->with('success', 'Session updated successfully');
     }
 }
