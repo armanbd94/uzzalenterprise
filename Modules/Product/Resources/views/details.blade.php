@@ -25,31 +25,18 @@
         <div class="card card-custom" style="padding-bottom: 100px !important;">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-9">
+                    <div class="col-md-12">
                         <table class="table table-borderless table-hover">
                             <tr><td width="25%"><b>{{__('file.Name')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->name }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Code')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->code }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Category')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->category->name }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Stock Unit')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->unit->unit_name }}</td></tr>
-                            <tr><td width="25%"><b>{{__('file.Sale Unit')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->sale_unit->unit_name }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Cost')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ number_format($product->cost,2) }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Price')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ number_format($product->price,2) }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Stock Quantity')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ number_format($product->qty,2) }}</td></tr>
-                            @if($product->has_opening_stock == 1)
-                            <tr><td width="25%"><b>{{__('file.Opening Stock Quantity')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ number_format($product->opening_stock_qty,2) }}</td></tr>
-                            <tr><td width="25%"><b>{{__('file.Opening Warehouse')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->opening_warehouse->name }}</td></tr>
-                            @endif
-                            <tr><td width="25%"><b>{{__('file.Tax')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->tax->rate }}%</td></tr>
-                            <tr><td width="25%"><b>{{__('file.Tax Method')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ TAX_METHOD[$product->tax_method] }}</td></tr>
                             <tr><td width="25%"><b>{{__('file.Alert Quantity')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->alert_quantity }}</td></tr>
-                            <tr><td width="25%"><b>{{__('file.Description')}}</b></td> <td  width="2%" class="text-center"><b>:</b></td> <td>{{ $product->description }}</td></tr>
                         </table>
                     </div>
-                    @if (!empty($product->image))
-                    <div class="col-md-3">
-                        <img src="{{ asset('storage/'.PRODUCT_IMAGE_PATH.$product->image) }}" alt="{{ $product->name }}" style="width: 100%;">
-                    </div>
-                    @endif
                 </div>
             </div>
         </div>

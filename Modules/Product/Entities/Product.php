@@ -14,35 +14,23 @@ class Product extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = [ 'name', 'category_id', 'code', 'unit_id', 'sale_unit_id', 'cost', 'price', 'qty', 'alert_quantity', 'image', 
-    'tax_id', 'tax_method', 'status', 'has_opening_stock', 'opening_stock_qty', 'opening_warehouse_id', 'description', 'created_by', 'modified_by'];
+    protected $fillable = [ 'name', 'category_id', 'code', 'unit_id', 'cost','old_cost', 'price', 'qty', 'alert_qty', 
+    'status', 'has_opening_stock', 'opening_stock_qty','opening_cost', 'opening_warehouse_id', 'created_by', 'modified_by'];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
+
     public function unit()
     {
         return $this->belongsTo(Unit::class,'unit_id','id');
     }
 
-    public function sale_unit()
-    {
-        return $this->belongsTo(Unit::class,'sale_unit_id','id');
-    }
-    public function tax()
-    {
-        return $this->belongsTo(Tax::class)->withDefault(['name'=>'No Tax','rate' => 0]);
-    }
     public function opening_warehouse()
     {
         return $this->belongsTo(Warehouse::class,'opening_warehouse_id','id')->withDefault(['name' => '']);
     }
-
-    // public function product_material(){
-    //     return $this->belongsToMany(Material::class,'product_material','product_id','material_id','id','id')
-    //                 ->withTimestamps();
-    // }
     
     /******************************************
      * * * Begin :: Custom Datatable Code * * *
@@ -73,12 +61,12 @@ class Product extends BaseModel
     {
         //set column sorting index table column name wise (should match with frontend table header)
         if (permission('product-bulk-delete')){
-            $this->column_order = [null,'id','id','name','code','category_id','unit_id','sale_unit_id','cost','price','qty', 'opening_stock_qty','tax_id','alert_quantity','tax_method','status',null];
+            $this->column_order = [null,'id','id','name','category_id','unit_id','cost','price','qty','alert_qty','status',null];
         }else{
-            $this->column_order = ['id','id','name','code','category_id','unit_id','sale_unit_id','cost','price','qty', 'opening_stock_qty','tax_id','tax_method','alert_quantity', 'status',null];
+            $this->column_order = ['id','id','name','category_id','unit_id','cost','price','qty', 'alert_qty', 'status',null];
         }
         
-        $query = self::with('category:id,name','tax:id,name,rate','unit:id,unit_name','sale_unit:id,unit_name');
+        $query = self::with('category:id,name','unit:id,unit_name');
 
         //search query
         if (!empty($this->_name)) {

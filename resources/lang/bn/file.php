@@ -112,6 +112,7 @@ return [
     'CSV'                                   => 'সিএসবি',
     'Excel'                                 => 'এক্সেল',
     'PDF'                                   => 'পিডিএফ',
+    'Opening Cost'                          => 'স্টকের শুরুর খরচ',
     'Opening Stock Quantity'                => 'স্টকের পরিমান শুরু',
     'Opening Stock Warehouse'               => 'গুদামের স্টকের পরিমান শুরু',
     'Stock Alert Quantity'                  => 'স্টক সতর্কতা পরিমাণ',

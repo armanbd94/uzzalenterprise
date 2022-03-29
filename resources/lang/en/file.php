@@ -110,6 +110,7 @@ return [
     'CSV'                                       => 'CSV',
     'Excel'                                     => 'Excel',
     'PDF'                                       => 'PDF',
+    'Opening Cost'                              => 'Opening Cost',
     'Opening Stock Quantity'                    => 'Opening Stock Quantity',
     'Opening Stock Warehouse'                   => 'Opening Stock Warehouse',
     'Stock Alert Quantity'                      => 'Stock Alert Quantity',

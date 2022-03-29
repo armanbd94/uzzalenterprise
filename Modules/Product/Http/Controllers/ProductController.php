@@ -74,21 +74,14 @@ class ProductController extends BaseController
                         $row[] = row_checkbox($value->id);//custom helper function to show the table each row checkbox
                     }
                     $row[] = $no;
-                    $row[] = $this->table_image(PRODUCT_IMAGE_PATH,$value->image,$value->name);
-                    $row[] = $value->name;
-                    $row[] = $value->code;
-                    $row[] = $value->category->name;
+                    $row[] = $value->name.'<br><b>Code: </b>'.$value->code.'<br><b>Category: </b>'.$value->category->name;
                     $row[] = $value->unit->unit_name;
-                    $row[] = $value->sale_unit->unit_name;
                     $row[] = number_format($value->cost,2);
                     $row[] = number_format($value->price,2);
                     $row[] = $value->qty;
-                    $row[] = $value->opening_stock_qty;
-                    $row[] = optional($value->tax)->name;
-                    $row[] = TAX_METHOD[$value->tax_method];
-                    $row[] = $value->alert_quantity;
+                    $row[] = $value->alert_qty;
                     $row[] = permission('product-edit') ? change_status($value->id,$value->status, $value->name) : STATUS_LABEL[$value->status];
-                    $row[] = action_button($action);//custom helper function for action button
+                    $row[] = action_button($action);
                     $data[] = $row;
                 }
                 return $this->datatable_draw($request->input('draw'),$this->model->count_all(),
@@ -103,12 +96,11 @@ class ProductController extends BaseController
     {
         if(permission('product-add')){
             $setTitle = __('file.Product');
-            $setSubTitle = __('file.Add Finished Goods');
+            $setSubTitle = __('file.Add Product');
             $this->setPageData($setSubTitle,$setSubTitle,'fab fa-product-hunt',[['name'=>$setTitle,'link'=> route('product')],['name' => $setSubTitle]]);
             $data = [
                 'categories' => Category::allProductCategories(),
                 'units'      => Unit::all(),
-                'taxes'      => Tax::activeTaxes(),
                 'warehouses' => Warehouse::activeWarehouses(),
             ];
             return view('product::create',$data);
@@ -123,114 +115,29 @@ class ProductController extends BaseController
             if(permission('product-add')){
                 DB::beginTransaction();
                 try {
-                    $collection        = collect($request->validated())->except('alert_quantity','tax_id');
-                    $alert_quantity    = $request->alert_quantity ? $request->alert_quantity : 0;
-                    $tax_id            = ($request->tax_id != 0) ? $request->tax_id : null;
-                    $has_opening_stock = $request->has_opening_stock;
-                    $image = !empty($request->old_image) ? $request->old_image : null;
-                    if($request->hasFile('image')){
-                        $image      = $this->upload_file($request->file('image'),PRODUCT_IMAGE_PATH);
-                    }
-                    $collection        = $collection->merge(compact('has_opening_stock','alert_quantity','tax_id','image'));
-                    if(empty($request->update_id))
-                    {
-                        $collection        = $collection->merge(['cost'=>0]);
-                    }
+                    // dd($request->all());
+                    $collection        = collect($request->validated())->except('has_opening_stock');
                     $collection        = $this->track_data($collection,$request->update_id);
-
                     if($request->update_id)
                     {
-                        $product_old_data = $this->model->find($request->update_id);
-                        if($has_opening_stock == 1)
-                        {
-                            if(!empty($product_old_data->opening_stock_qty))
-                            {
-                                $old_warehouse_product = WarehouseProduct::where([
-                                    ['warehouse_id',$product_old_data->opening_warehouse_id],
-                                    ['product_id',$product_old_data->id],
-                                    ['qty','<>',0]
-                                    ])->first();
-                                if($old_warehouse_product){
-                                    $old_warehouse_product->qty -= $product_old_data->opening_stock_qty;
-                                    $old_warehouse_product->update();
-                                }
-
-                                $product_old_data->qty -= $product_old_data->opening_stock_qty;
-                                $product_old_data->update();
-
-                                $product_new_data = $this->model->find($request->update_id);
-                                $product_new_data->qty += $request->opening_stock_qty;
-                                $product_new_data->update();
-
-                                $new_warehouse_product = WarehouseProduct::where(['warehouse_id' =>$request->opening_warehouse_id,'product_id' => $request->update_id])->first();
-                                if($new_warehouse_product)
-                                {
-                                    $new_warehouse_product->qty += $request->opening_stock_qty;
-                                    $new_warehouse_product->update();
-                                }else{
-                                    WarehouseProduct::create([
-                                        'warehouse_id' => $request->opening_warehouse_id,
-                                        'product_id' => $request->update_id,
-                                        'qty' => $request->opening_stock_qty,
-                                    ]);
-                                }
-                            }else{
-                                $product_old_data->qty += $request->opening_stock_qty;
-                                $product_old_data->update();
-
-                                $new_warehouse_product = WarehouseProduct::where(['warehouse_id' =>$request->opening_warehouse_id,'product_id' => $request->update_id])->first();
-                                if($new_warehouse_product)
-                                {
-                                    $new_warehouse_product->qty += $request->opening_stock_qty;
-                                    $new_warehouse_product->update();
-                                }else{
-                                    WarehouseProduct::create([
-                                        'warehouse_id' => $request->opening_warehouse_id,
-                                        'product_id' => $request->update_id,
-                                        'qty' => $request->opening_stock_qty,
-                                    ]);
-                                }
-                            }
-                        }else{
-                            if(!empty($product_old_data->opening_stock_qty))
-                            {
-                                $old_warehouse_product = WarehouseProduct::where(['warehouse_id' => $product_old_data->opening_warehouse_id,'product_id' => $product_old_data->id])->first();
-
-                                if($old_warehouse_product){
-                                    $old_warehouse_product->qty -= $product_old_data->opening_stock_qty;
-                                    $old_warehouse_product->update();
-                                }
-                                $product_old_data->qty -= $product_old_data->opening_stock_qty;
-                                $product_old_data->update();
-                            }
-                        }
-                        $result     = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
+                        $result     = $this->model->find($request->update_id)->update($collection->all());
                     }else{
-                        $result = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
+                        $has_opening_stock = $request->has_opening_stock ? $request->has_opening_stock : 2;
+                        $collection        = $collection->merge(compact('has_opening_stock'));
                         if($has_opening_stock == 1)
                         {
-                            $product      = $this->model->find($result->id);
-                            $product->qty = $request->opening_stock_qty;
-                            $product->update();
+                            $cost       = $request->opening_cost;
+                            $qty        = $request->opening_stock_qty;
+                            $collection = $collection->merge(compact('cost','qty'));
+                        }
+                        $result = $this->model->create($collection->all());
+                        if($has_opening_stock == 1)
+                        {
                             WarehouseProduct::create([
                                 'warehouse_id' => $request->opening_warehouse_id,
                                 'product_id'   => $result->id,
                                 'qty'          => $request->opening_stock_qty,
                             ]);
-                        }
-                    }
-                    if($result)
-                    {
-                        if($request->hasFile('image')){
-                            if(!empty($request->old_image)){
-                                $this->delete_file($request->old_image, PRODUCT_IMAGE_PATH);
-                            }
-                        }
-                    }else{
-                        if($request->hasFile('image')){
-                            if(!empty($image)){
-                                $this->delete_file($image, PRODUCT_IMAGE_PATH);
-                            }
                         }
                     }
                     $output     = $this->store_message($result, $request->update_id);
@@ -252,14 +159,12 @@ class ProductController extends BaseController
     {
         if(permission('product-edit')){
             $setTitle = __('file.Product');
-            $setSubTitle = __('file.Edit Finished Goods');
+            $setSubTitle = __('file.Edit Product');
             $this->setPageData($setSubTitle,$setSubTitle,'fab fa-pencil',[['name'=>$setTitle,'link'=> route('product')],['name' => $setSubTitle]]);
             $data = [
                 'product'    => $this->model->findOrFail($id),
                 'categories' => Category::allProductCategories(),
                 'units'      => Unit::all(),
-                'taxes'      => Tax::activeTaxes(),
-                'warehouses' => Warehouse::activeWarehouses(),
             ];
             return view('product::edit',$data);
         }else{
@@ -272,7 +177,7 @@ class ProductController extends BaseController
             $setTitle = __('file.Product');
             $setSubTitle = __('file.Product Details');
             $this->setPageData($setSubTitle,$setSubTitle,'fas fa-paste',[['name'=>$setTitle,'link'=> route('product')],['name' => $setSubTitle]]);
-            $product = $this->model->with('category','tax','unit','sale_unit','opening_warehouse')->findOrFail($id);
+            $product = $this->model->with('category','unit')->findOrFail($id);
             return view('product::details',compact('product'));
         }else{
             return $this->access_blocked();
@@ -282,13 +187,20 @@ class ProductController extends BaseController
     {
         if($request->ajax()){
             if(permission('product-delete')){
-                $product  = $this->model->find($request->id);
-                $old_image = $product ? $product->image : '';
-                $result    = $product->delete();
-                if($result && $old_image != ''){
-                    $this->delete_file($old_image, PRODUCT_IMAGE_PATH);
+                DB::beginTransaction();
+                try {
+                    $product  = $this->model->find($request->id);
+                    if($product->has_opening_stock == 1)
+                    {
+                        WarehouseProduct::where(['warehouse_id' => $product->opening_warehouse_id,'product_id'=>$product->id])->delete();
+                    }
+                    $result    = $product->delete();
+                    $output   = $this->delete_message($result);
+                    DB::commit();
+                }catch (\Throwable $th) {
+                   DB::rollback();
+                   $output = ['status' => 'error','message' => $th->getMessage()];
                 }
-                $output   = $this->delete_message($result);
             }else{
                 $output   = $this->unauthorized();
 
@@ -303,21 +215,22 @@ class ProductController extends BaseController
     {
         if($request->ajax()){
             if(permission('product-bulk-delete')){
-                // $result   = $this->model->destroy($request->ids);
-                // $output   = $this->bulk_delete_message($result);
-                $products = $this->model->toBase()->select('image')->whereIn('id',$request->ids)->get();
-                $result = $this->model->destroy($request->ids);
-                if($result){
-                    if(!empty($products)){
-                        foreach ($products as $product) {
-                            if($product->image != null)
-                            {
-                                $this->delete_file($product->image,PRODUCT_IMAGE_PATH);
-                            }
+                DB::beginTransaction();
+                try {
+                    $products = $this->model->toBase()->whereIn('id',$request->ids)->get();
+                    foreach ($products as $product) {
+                        if($product->has_opening_stock == 1)
+                        {
+                            WarehouseProduct::where(['warehouse_id' => $product->opening_warehouse_id,'product_id'=>$product->id])->delete();
                         }
                     }
+                    $result = $this->model->destroy($request->ids);
+                    $output   = $this->bulk_delete_message($result);
+                    DB::commit();
+                }catch (\Throwable $th) {
+                   DB::rollback();
+                   $output = ['status' => 'error','message' => $th->getMessage()];
                 }
-                $output   = $this->bulk_delete_message($result);
             }else{
                 $output   = $this->unauthorized();
             }
@@ -326,16 +239,33 @@ class ProductController extends BaseController
             return response()->json($this->unauthorized());
         }
     }
+
+    public function change_status(Request $request)
+    {
+        if($request->ajax()){
+            if(permission('product-edit')){
+                $result   = $this->model->find($request->id)->update(['status' => $request->status]);
+                $output   = $result ? ['status' => 'success','message' => $this->responseMessage('Status Changed')]
+                : ['status' => 'error','message' => $this->responseMessage('Status Changed Failed')];
+            }else{
+                $output       = $this->unauthorized();
+            }
+            return response()->json($output);
+        }else{
+            return response()->json($this->unauthorized());
+        }
+    }
+
     //Generate Material Code
     public function generateProductCode()
     {
-    $code = Keygen::numeric(8)->generate();
-    //Check Material Code ALready Exist or Not
-    if(DB::table('products')->where('code',$code)->exists())
-    {
-        $this->generateProductCode();
-    }else{
-        return response()->json($code);
-    }
+        $code = Keygen::numeric(8)->generate();
+        //Check Material Code ALready Exist or Not
+        if(DB::table('products')->where('code',$code)->exists())
+        {
+            $this->generateProductCode();
+        }else{
+            return response()->json($code);
+        }
     }
 }

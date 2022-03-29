@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('title', $page_title)
-@push('styles')
-@endpush
+
 @section('content')
 <div class="d-flex flex-column-fluid">
     <div class="container-fluid">
@@ -26,105 +25,60 @@
                 <form id="store_or_update_form" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="row">
-                                <input type="hidden" name="has_opening_stock" id="has_opening_stock" value="2"/>
+                        <input type="hidden" name="has_opening_stock" id="has_opening_stock" value="2"/>
 
-                                <x-form.textbox labelName="{{__('file.Product Name')}}" name="name" required="required" col="col-md-6" placeholder="{{__('file.Enter product name')}}"/>
+                        <x-form.textbox labelName="{{__('file.Product Name')}}" name="name" required="required" col="col-md-6" placeholder="{{__('file.Enter product name')}}"/>
 
-                                <div class="col-md-6 form-group required">
-                                    <label for="code">{{__('file.Code')}}</label>
-                                    <div class="input-group" id="code_section">
-                                        <input type="text" class="form-control" name="code" id="code">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-primary" id="generate-code"  data-toggle="tooltip" data-theme="dark" title="{{__('file.Generate Code')}}"
-                                            style="border-top-right-radius: 0.42rem;border-bottom-right-radius: 0.42rem;border:0;cursor: pointer;">
-                                                <i class="fas fa-retweet text-white"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <x-form.selectbox labelName="{{__('file.Category')}}" name="category_id" required="required" col="col-md-6" class="selectpicker">
-                                    @if (!$categories->isEmpty())
-                                        @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-form.selectbox>
-                                <div class="form-group col-md-6 required">
-                                    <label for="code">{{__('file.Unit')}}</label>
-                                    <select name="unit_id" id="unit_id"  onchange="populate_unit(this.value)" class="form-control selectpicker" data-live-search="true"  data-live-search-placeholder="Search">
-                                        <option value="">{{__('file.Select Please')}}</option>
-                                        @if (!$units->isEmpty())
-                                            @foreach ($units as $unit)
-                                                @if ($unit->base_unit == null)
-                                                <option value="{{ $unit->id }}">{{ $unit->unit_name.' ('.$unit->unit_code.')' }}</option>
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-6 required">
-                                    <label for="code">{{__('file.Sale Unit')}}</label>
-                                    <select name="sale_unit_id" id="sale_unit_id"  class="form-control selectpicker" data-live-search="true"  data-live-search-placeholder="Search"></select>
-                                </div>
-                                {{-- <x-form.textbox labelName="Product Cost" name="cost" required="required" col="col-md-6" placeholder="Enter product cost"/> --}}
-                                <x-form.textbox labelName="{{__('file.Product Price')}}" name="price" required="required" col="col-md-6" placeholder="{{__('file.Enter product price')}}"/>
-                                <x-form.textbox labelName="{{__('file.Opening Stock Quantity')}}" name="opening_stock_qty" required="required"  col="col-md-6 d-none product-qty" placeholder="0"/>
-                                <x-form.selectbox labelName="{{__('file.Opening Stock Warehouse')}}" name="opening_warehouse_id" required="required"  col="col-md-6 opening-warehouse-id d-none" class="selectpicker" onchange="populate_unit(this.value)">
-                                    @if (!$warehouses->isEmpty())
-                                        @foreach ($warehouses as $warehouse)
-                                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-form.selectbox>
-                                <x-form.textbox labelName="{{__('file.Alert Quantity')}}" name="alert_quantity"  col="col-md-6" placeholder="{{__('file.Enter product alert qty')}}"/>
-                                <div class="col-md-6 form-group">
-                                    <label for="tax_id">{{__('file.Product Tax')}}</label>
-                                    <select name="tax_id" id="tax_id" required="required" class="form-control selectpicker">
-                                        <option value="0" selected>{{__('file.No Tax')}}</option>
-                                        @if (!$taxes->isEmpty())
-                                            @foreach ($taxes as $tax)
-                                                <option value="{{ $tax->id }}"  {{ isset($product) ? (($product->tax_id == $tax->id) ? 'selected' : '')  : '' }}>{{ $tax->name }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6 form-group">
-                                    <label for="tax_method">{{__('file.Tax Method')}}<span class="text-danger">*</span> <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
-                                        data-theme="dark" title="Exclusive: Poduct price = Actual product price + Tax. Inclusive: Actual product price = Product price - Tax"></i></label>
-                                    <select name="tax_method" id="tax_method" required="required" class="form-control selectpicker">
-                                    @foreach (TAX_METHOD as $key => $value)
-                                        <option value="{{ $key }}"
-                                        @if(isset($product)) @if($product->tax_method == $key) {{ 'selected' }} @endif @else  @if($key == 1){{ 'selected' }} @endif @endif>{{ $value }}</option>
-                                    @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-md-12">
-                                    <label for="description">{{__('file.Description')}}</label>
-                                    <textarea class="form-control" name="description" id="description"></textarea>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="opening_stock">
-                                        <label class="custom-control-label" for="opening_stock">{{__('file.This product has opening stock')}}</label>
-                                    </div>
+                        <div class="col-md-6 form-group required">
+                            <label for="code">{{__('file.Code')}}</label>
+                            <div class="input-group" id="code_section">
+                                <input type="text" class="form-control" name="code" id="code">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-primary" id="generate-code"  data-toggle="tooltip" data-theme="dark" title="{{__('file.Generate Code')}}"
+                                    style="border-top-right-radius: 0.42rem;border-bottom-right-radius: 0.42rem;border:0;cursor: pointer;">
+                                        <i class="fas fa-retweet text-white"></i>
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="row">
-                                <div class="form-group col-md-12 mb-0">
-                                    <label for="logo" class="form-control-label">{{__('file.Product Image')}}</label>
-                                    <div class="col=md-12 px-0  text-center">
-                                        <div id="image">
 
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="old_image" id="old_image">
-                                </div>
+                        <x-form.selectbox labelName="{{__('file.Category')}}" name="category_id" required="required" col="col-md-6" class="selectpicker">
+                            @if (!$categories->isEmpty())
+                                @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
+
+                        <div class="form-group col-md-6 required">
+                            <label for="code">{{__('file.Unit')}}</label>
+                            <select name="unit_id" id="unit_id"  onchange="populate_unit(this.value)" class="form-control selectpicker" data-live-search="true"  data-live-search-placeholder="Search">
+                                <option value="">{{__('file.Select Please')}}</option>
+                                @if (!$units->isEmpty())
+                                    @foreach ($units as $unit)
+                                        @if ($unit->base_unit == null)
+                                        <option value="{{ $unit->id }}">{{ $unit->unit_name.' ('.$unit->unit_code.')' }}</option>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        
+                        <x-form.textbox labelName="{{__('file.Product Price')}}" name="price" required="required" col="col-md-6" placeholder="{{__('file.Enter product price')}}"/>
+                        <x-form.textbox labelName="{{__('file.Opening Cost')}}" name="opening_cost" required="required"  col="col-md-6 d-none product-cost" placeholder="0"/>
+                        <x-form.textbox labelName="{{__('file.Opening Stock Quantity')}}" name="opening_stock_qty" required="required"  col="col-md-6 d-none product-qty" placeholder="0"/>
+                        <x-form.selectbox labelName="{{__('file.Opening Stock Warehouse')}}" name="opening_warehouse_id" required="required"  col="col-md-6 opening-warehouse-id d-none" class="selectpicker" onchange="populate_unit(this.value)">
+                            @if (!$warehouses->isEmpty())
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
+                        <x-form.textbox labelName="{{__('file.Alert Quantity')}}" name="alert_qty"  col="col-md-6" placeholder="{{__('file.Enter product alert qty')}}"/>
+                        <div class="form-group col-md-6">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="opening_stock">
+                                <label class="custom-control-label" for="opening_stock">{{__('file.This product has opening stock')}}</label>
                             </div>
                         </div>
                     </div>
@@ -143,30 +97,8 @@
 </div>
 @endsection
 @push('scripts')
-<script src="{{asset('js/spartan-multi-image-picker-min.js')}}"></script>
 <script>
 $(document).ready(function () {
-
-    $("#image").spartanMultiImagePicker({
-        fieldName:        'image',
-        maxCount: 1,
-        rowHeight:        '200px',
-        groupClassName:   'col-md-12 col-sm-12 col-xs-12',
-        maxFileSize:      '',
-        dropFileLabel : "Drop Here",
-        allowedExt: 'png|jpg|jpeg',
-        onExtensionErr : function(index, file){
-            Swal.fire({icon: 'error',title: 'Oops...',text: '{{__('file.Only png,jpg,jpeg file format allowed!')}}'});
-        },
-
-    });
-
-    $("input[name='image']").prop('required',true);
-
-    $('.remove-files').on('click', function(){
-        $(this).parents(".col-md-12").remove();
-    });
-
 
     //Generate Material Code
     $(document).on('click','#generate-code',function(){
@@ -192,35 +124,17 @@ $(document).ready(function () {
     $(document).on('change','#opening_stock', function(){
         if($(this).is(':checked')) {
             $('#has_opening_stock').val(1);
-            $('.product-qty,.opening-warehouse-id').removeClass('d-none');
-            $('#opening_stock_qty,#opening_warehouse_id').val('');
+            $('.product-cost,.product-qty,.opening-warehouse-id').removeClass('d-none');
+            $('#opening_cost,#opening_stock_qty,#opening_warehouse_id').val('');
             $('#store_or_update_form .selectpicker').selectpicker('refresh');
         }else{
             $('#has_opening_stock').val(2);
-            $('#opening_stock_qty,#opening_warehouse_id').val('');
+            $('#opening_cost,#opening_stock_qty,#opening_warehouse_id').val('');
             $('#store_or_update_form .selectpicker').selectpicker('refresh');
-            $('.product-qty,.opening-warehouse-id').addClass('d-none');
+            $('.product-cost,.product-qty,.opening-warehouse-id').addClass('d-none');
         }
     });
-
-
 });
-
-function populate_unit(unit_id)
-{
-    $.ajax({
-        url:"{{ url('populate-unit') }}/"+unit_id,
-        type:"GET",
-        dataType:"JSON",
-        success:function(data){
-            $('#sale_unit_id').empty();
-            $.each(data, function(key, value) {
-                $('#sale_unit_id').append('<option value="'+ key +'">'+ value +'</option>');
-            });
-            $('#sale_unit_id.selectpicker').selectpicker('refresh');
-        },
-    });
-}
 
 function store_data(btn){
     let form = document.getElementById('store_or_update_form');

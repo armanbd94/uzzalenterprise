@@ -71,18 +71,11 @@
                                         </th>
                                         @endif
                                         <th>{{__('file.SL')}}</th>
-                                        <th>{{__('file.Image')}}</th>
                                         <th>{{__('file.Name')}}</th>
-                                        <th>{{__('file.Code')}}</th>
-                                        <th>{{__('file.Category')}}</th>
                                         <th>{{__('file.Stock Unit')}}</th>
-                                        <th>{{__('file.Sale Unit')}}</th>
                                         <th>{{__('file.Cost')}}</th>
                                         <th>{{__('file.Price')}}</th>
                                         <th>{{__('file.Stock Qty')}}</th>
-                                        <th>{{__('file.Opening Stock Qty')}}</th>
-                                        <th>{{__('file.Tax')}}</th>
-                                        <th>{{__('file.Tax Method')}}</th>
                                         <th>{{__('file.Alert Qty')}}</th>
                                         <th>{{__('file.Status')}}</th>
                                         <th>{{__('file.Action')}}</th>
@@ -136,26 +129,26 @@
             },
             "columnDefs": [{
                     @if (permission('product-bulk-delete'))
-                    "targets": [0,16],
+                    "targets": [0,9],
                     @else
-                    "targets": [15],
+                    "targets": [8],
                     @endif
                     "orderable": false,
                     "className": "text-center"
                 },
                 {
                     @if (permission('product-bulk-delete'))
-                    "targets": [1,2,4,5,6,7,10,11,12,13,14,15],
+                    "targets": [1,3,6,7,8],
                     @else
-                    "targets": [0,1,3,4,5,6,9,10,11,12,13,14],
+                    "targets": [0,2,5,6,7],
                     @endif
                     "className": "text-center"
                 },
                 {
                     @if (permission('product-bulk-delete'))
-                    "targets": [8,9],
+                    "targets": [4,5],
                     @else
-                    "targets": [7,8],
+                    "targets": [3,4],
                     @endif
                     "className": "text-right"
                 },
@@ -166,7 +159,6 @@
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'<'float-right'p>>>",
 
             "buttons": [
-                @if (permission('product-report'))
                 {
                     'extend':'colvis','className':'btn btn-secondary btn-sm text-white','text':'{{__('file.Column')}}','columns': ':gt(0)'
                 },
@@ -179,9 +171,9 @@
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
                         @if (permission('material-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(16))'
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(15))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     },
                     customize: function (win) {
@@ -201,9 +193,9 @@
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
                          @if (permission('material-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(16))'
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(15))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     }
                 },
@@ -214,10 +206,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                         @if (permission('material-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(16))'
+                        @if (permission('material-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(15))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     },
                 },
@@ -230,10 +222,10 @@
                     "orientation": "landscape", //portrait
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
-                         @if (permission('material-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(16))'
+                        @if (permission('material-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(9))'
                         @else
-                        columns: ':visible:not(:eq(15))'
+                        columns: ':visible:not(:eq(8))'
                         @endif
                     },
                     customize: function(doc) {
@@ -242,7 +234,6 @@
                         doc.pageMargins = [5,5,5,5];
                     }
                 },
-                @endif
                 @if (permission('product-bulk-delete'))
                 {
                     'className':'btn btn-danger btn-sm delete_btn d-none text-white',

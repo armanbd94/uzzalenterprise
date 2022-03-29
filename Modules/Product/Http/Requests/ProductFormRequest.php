@@ -16,16 +16,12 @@ class ProductFormRequest extends FormRequest
         $rules['name']                 = ['required','string','unique:products,name'];
         $rules['category_id']          = ['required'];
         $rules['code']                 = ['required','string','unique:products,code'];
-        // $rules['cost']                 = ['required','numeric','gte:0'];
         $rules['price']                = ['required','numeric','gte:0'];
         $rules['unit_id']              = ['required'];
-        $rules['sale_unit_id']         = ['required'];
-        $rules['alert_quantity']       = ['nullable','numeric','gte:0'];
-        $rules['tax_id']               = ['nullable','numeric'];
-        $rules['tax_method']           = ['required','numeric'];
+        $rules['alert_qty']            = ['nullable','numeric','gte:0'];
+        $rules['opening_cost']         = ['nullable','numeric','gte:0'];
         $rules['opening_stock_qty']    = ['nullable','numeric'];
         $rules['opening_warehouse_id'] = ['nullable','numeric'];
-        $rules['description'] = ['nullable','string'];
 
         if(request()->update_id){
             $rules['name'][2] = 'unique:products,name,'.request()->update_id;
@@ -34,6 +30,7 @@ class ProductFormRequest extends FormRequest
 
         if(request()->has_opening_stock == 1)
         {
+            $rules['opening_cost'][0]         = 'required';
             $rules['opening_stock_qty'][0]    = 'required';
             $rules['opening_warehouse_id'][0] = 'required';
         }
