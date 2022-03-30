@@ -100,6 +100,7 @@ class SupplierController extends BaseController
                     $collection = $this->track_data($collection,$request->update_id);
                     $supplier   = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
                     $output     = $this->store_message($supplier, $request->update_id);
+                    $output['id']  = $supplier->id;
                     if($request->update_id)
                     {
                         $supplier_coa = ChartOfAccount::where(['supplier_id'=>$request->update_id])->first();
@@ -303,7 +304,7 @@ class SupplierController extends BaseController
             if(!$customers->isEmpty())
             {
                 foreach ($customers as $key => $value) {
-                    $output .= '<option value="'.$value->id.'">'.$value->name.' - '.$value->mobile.'</option>';
+                    $output .= '<option value="'.$value->id.'">'.$value->name.' - '.translate($value->mobile,App::getLocale()).'</option>';
                 }
             }
             return $output;

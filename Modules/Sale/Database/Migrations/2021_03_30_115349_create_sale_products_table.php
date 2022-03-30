@@ -19,13 +19,10 @@ class CreateSaleProductsTable extends Migration
             $table->foreign('sale_id')->references('id')->on('sales');
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products');
+            $table->string('vehicle_no',100)->nullable()->index('vehicle_no');
+            $table->string('challan_no',100)->nullable();
             $table->double('qty');
-            $table->unsignedBigInteger('sale_unit_id')->nullable();
-            $table->foreign('sale_unit_id')->references('id')->on('units');
-            $table->double('net_unit_price');
-            $table->double('discount');
-            $table->double('tax_rate');
-            $table->double('tax');
+            $table->double('price');
             $table->double('total');
             $table->timestamps();
         });

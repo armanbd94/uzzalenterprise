@@ -2,13 +2,18 @@
 
 namespace Modules\Sale\Entities;
 
-use Illuminate\Database\Eloquent\Model;
+use Modules\Sale\Entities\Sale;
 use Modules\Product\Entities\Product;
+use Illuminate\Database\Eloquent\Model;
 
 class SaleProduct extends Model
 {
-    protected $fillable = ['sale_id', 'product_id', 'qty', 'delivered','delivered_warehouse_id','sale_unit_id', 'net_unit_price', 'discount', 'tax_rate', 'tax', 'total'];
+    protected $fillable = ['purchase_id', 'product_id', 'qty', 'vehicle_no', 'challan_no', 'price', 'total','net_unit_cost','total_cost'];
 
+    public function sale()
+    {
+        return $this->belongsTo(Sale::class);
+    }
     public function product()
     {
         return $this->belongsTo(Product::class);

@@ -27,4 +27,7 @@ Route::group(['middleware' => ['auth','language']], function () {
         Route::post('change-status', 'ProductController@change_status')->name('change.status');
         Route::get('generate-code', 'ProductController@generateProductCode')->name('generate.code');
     });
+
+    Route::get('product-report', 'ProductReportController@index')->name('product.report');
+    Route::post('product-report/data', 'ProductReportController@report_data')->name('product.report.data');
 });

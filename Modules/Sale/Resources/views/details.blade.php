@@ -1,9 +1,12 @@
 @extends('layouts.app')
+
 @section('title', $page_title)
+
 @push('styles')
 <style>
 </style>
 @endpush
+
 @section('content')
 <div class="d-flex flex-column-fluid">
     <div class="container-fluid">
@@ -16,8 +19,9 @@
                 <div class="card-toolbar">
                     <!--begin::Button-->
                     <button type="button" class="btn btn-primary btn-sm mr-3" id="print-invoice"> <i class="fas fa-print"></i>{{__('file.Print')}}</button>
-                    <a href="{{ route('sale') }}" class="btn btn-warning btn-sm font-weight-bolder">
-                        <i class="fas fa-arrow-left"></i> {{__('file.Back')}}</a>
+
+                    <a href="{{ route('purchase') }}" class="btn btn-warning btn-sm font-weight-bolder">
+                        <i class="fas fa-arrow-left"></i>{{__('file.Back')}}</a>
                     <!--end::Button-->
                 </div>
             </div>
@@ -28,443 +32,156 @@
             <div class="card-body" style="padding-bottom: 100px !important;">
                 <div class="col-md-12 col-lg-12"  style="width: 100%;">
                     <div id="invoice">
-                        <style>
-                            body,html {
-                                background: #fff !important;
-                                -webkit-print-color-adjust: exact !important;
-                            }
-                            .invoice {
-                                /* position: relative; */
-                                background: #fff !important;
-                                /* min-height: 680px; */
-                            }
-                            .invoice header {
-                                padding: 10px 0;
-                                margin-bottom: 20px;
-                                border-bottom: 1px solid #036;
-                            }
-                            .invoice .company-details {
-                                text-align: right
-                            }
-                            .invoice .company-details .name {
-                                margin-top: 0;
-                                margin-bottom: 0;
-                            }
-                            .invoice .contacts {
-                                margin-bottom: 20px;
-                            }
-                            .invoice .invoice-to {
-                                text-align: left;
-                            }
-                            .invoice .invoice-to .to {
-                                margin-top: 0;
-                                margin-bottom: 0;
-                            }
-                            .invoice .invoice-details {
-                                text-align: right;
-                            }
-                            .invoice .invoice-details .invoice-id {
-                                margin-top: 0;
-                                color: #036;
-                            }
-                            .invoice main {
-                                padding-bottom: 50px
-                            }
-                            .invoice main .thanks {
-                                margin-top: -100px;
-                                font-size: 2em;
-                                margin-bottom: 50px;
-                            }
-                            .invoice main .notices {
-                                padding-left: 6px;
-                                border-left: 6px solid #036;
-                            }
-                            .invoice table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                border-spacing: 0;
-                                margin-bottom: 20px;
-                            }
-                            .invoice table th {
-                                background: #036;
-                                color: #fff;
-                                padding: 15px;
-                                border-bottom: 1px solid #fff
-                            }
-                            .invoice table td {
-                                padding: 15px;
-                                border-bottom: 1px solid #fff
-                            }
-                            .invoice table th {
-                                white-space: nowrap;
-                            }
-                            .invoice table td h3 {
-                                margin: 0;
-                                color: #036;
-                            }
-                            .invoice table .qty {
-                                text-align: center;
-                            }
-                            .invoice table .price,
-                            .invoice table .discount,
-                            .invoice table .tax,
-                            .invoice table .total {
-                                text-align: right;
-                            }
-                            .invoice table .no {
-                                color: #fff;
-                                background: #036
-                            }
-                            .invoice table .total {
-                                background: #036;
-                                color: #fff
-                            }
-                            .invoice table tbody tr:last-child td {
-                                border: none
-                            }
-                            .invoice table tfoot td {
-                                background: 0 0;
-                                border-bottom: none;
-                                white-space: nowrap;
-                                text-align: right;
-                                padding: 10px 20px;
-                                border-top: 1px solid #aaa;
-                                font-weight: bold;
-                            }
-                            .invoice table tfoot tr:first-child td {
-                                border-top: none
-                            }
-                            /* .invoice table tfoot tr:last-child td {
-                                color: #036;
-                                border-top: 1px solid #036
-                            } */
-                            .invoice table tfoot tr td:first-child {
-                                border: none
-                            }
-                            .invoice footer {
-                                width: 100%;
-                                text-align: center;
-                                color: #777;
-                                border-top: 1px solid #aaa;
-                                padding: 8px 0
-                            }
-                            .invoice a {
-                                content: none !important;
-                                text-decoration: none !important;
-                                color: #036 !important;
-                            }
-                            .page-header,
-                            .page-header-space {
-                                height: 100px;
-                            }
-                            .page-footer,
-                            .page-footer-space {
-                                height: 20px;
-
-                            }
-                            .page-footer {
-                                position: fixed;
-                                bottom: 0;
-                                width: 100%;
-                                text-align: center;
-                                color: #777;
-                                border-top: 1px solid #aaa;
-                                padding: 8px 0
-                            }
-                            .page-header {
-                                position: fixed;
-                                top: 0mm;
-                                width: 100%;
-                                border-bottom: 1px solid black;
-                            }
-                            .page {
-                                page-break-after: always;
-                            }
-                            .dashed-border{
-                                width:180px;height:2px;margin:0 auto;padding:0;border-top:1px dashed #454d55 !important;
-                            }
-                            @media screen {
-                                .no_screen {display: none;}
-                                .no_print {display: block;}
-                                thead {display: table-header-group;}
-                                tfoot {display: table-footer-group;}
-                                button {display: none;}
-                                body {margin: 0;}
-                            }
-                            @media print {
-                                body,
-                                html {
-                                    /* background: #fff !important; */
-                                    -webkit-print-color-adjust: exact !important;
-                                    font-family: sans-serif;
-                                    /* font-size: 12px !important; */
-                                    margin-bottom: 100px !important;
-                                }
-                                .m-0 {
-                                    margin: 0 !important;
-                                }
-                                h1,
-                                h2,
-                                h3,
-                                h4,
-                                h5,
-                                h6 {
-                                    margin: 0 !important;
-                                }
-                                .no_screen {
-                                    display: block !important;
-                                }
-                                .no_print {
-                                    display: none;
-                                }
-                                a {
-                                    content: none !important;
-                                    text-decoration: none !important;
-                                    color: #036 !important;
-                                }
-                                .text-center {
-                                    text-align: center !important;
-                                }
-                                .text-left {
-                                    text-align: left !important;
-                                }
-                                .text-right {
-                                    text-align: right !important;
-                                }
-                                .float-left {
-                                    float: left !important;
-                                }
-                                .float-right {
-                                    float: right !important;
-                                }
-                                .text-bold {
-                                    font-weight: bold !important;
-                                }
-                                .invoice {
-                                    /* font-size: 11px!important; */
-                                    overflow: hidden !important;
-                                    background: #fff !important;
-                                    margin-bottom: 100px !important;
-                                }
-                                .invoice footer {
-                                    position: absolute;
-                                    bottom: 0;
-                                    left: 0;
-                                    /* page-break-after: always */
-                                }
-                                /* .invoice>div:last-child {
-                                    page-break-before: always
-                                } */
-                                .hidden-print {
-                                    display: none !important;
-                                }
-                                .dashed-border{
-                                    width:180px;height:2px;margin:0 auto;padding:0;border-top:1px dashed #454d55 !important;
-                                }
-                            }
-                            @page {
-                                /* size: auto; */
-                                margin: 5mm 5mm;
-
-                            }
-                        </style>
+                        <x-base.invoice-style />
                         <div class="invoice overflow-auto">
                             <div>
-                                <table>
+                                <table width="100%" style="margin:0;padding:0;">
                                     <tr>
-                                        <td class="text-center">
-                                            <h2 class="name m-0" style="text-transform: uppercase;"><b>{{ config('settings.title') ? config('settings.title') : env('APP_NAME') }}</b></h2>
-                                            @if(config('settings.contact_no'))<p style="font-weight: normal;margin:0;"><b>{{__('file.Contact No')}}.: </b>{{ config('settings.contact_no') }}, @if(config('settings.email'))<b>{{__('file.Email')}}: </b>{{ config('settings.email') }}@endif</p>@endif
-                                            @if(config('settings.address'))<p style="font-weight: normal;margin:0;">{{ config('settings.address') }}</p>@endif
-                                            <p style="font-weight: normal;margin:0;"><b>{{__('file.Date')}}: </b>{{ date('d-M-Y') }}</p>
+                                        <td width="15%">
+                                            @if (config('settings.logo'))
+                                                <img src="{{ asset('storage/'.LOGO_PATH.config('settings.logo'))}}" style="max-width: 100px;" alt="Logo" />
+                                            @endif
+                                        </td>
+                                        <td width="70%" class="text-center">
+                                            <h1 style="margin:0;" class="site_title"><b>{{ config('settings.title') ? config('settings.title') : env('APP_NAME') }}</b></h1>
+                                            @if(config('settings.address'))<p style="font-weight: normal;margin:0;"><b>{{ config('settings.address') }}</b></p>@endif
+                                            @if(config('settings.contact_no'))<p style="font-weight: normal;margin:0;"><b>{{ __('file.Contact') }}: </b>{{ translate(config('settings.contact_no'),App::getLocale()) }}
+                                                 @if(config('settings.email'))<b>, {{ __('file.Email') }}: </b>{{ config('settings.email') }}@endif</p>@endif
+                                                 <p style="font-weight: normal;font-weight:bold;    margin: 10px auto 5px auto;
+                                                            font-weight: bold;background: black;
+                                                            border-radius: 10px;width: 250px;color: white;text-align: center;padding:5px 0;">{{ __('file.Sale Invoice') }}</p>
+                                           
+                                        </td>
+                                        <td width="15%"></td>
+                                    </tr>
+                                </table>
+                                <div style="width: 100%;height:3px;border-top:2px dashed #000;"></div>
+                                <table id="info_table" style="margin-top: 10px;">
+                                    <tr>
+                                        <td width="30%">
+                                            <table>
+                                                <tr><td><b>{{ __('file.From') }}</b></td></tr>
+                                                <tr><td>{{ $sale->warehouse->name }}</td></tr>
+                                                <tr><td>{{ $sale->warehouse->phone }}</td></tr>
+                                                @if($sale->warehouse->address)
+                                                <tr><td>{{ $sale->warehouse->address }}</td></tr>
+                                                @endif
+                                            </table>
+                                        </td>
+                                        <td width="40%">
+                                            <table>
+                                                <tr><td><b>{{ __('file.To') }}</b></td></tr>
+                                                <tr><td>{{ $sale->customer->name }}</td></tr>
+                                                <tr><td>{{ $sale->customer->company_name }}</td></tr>
+                                                <tr><td>{{ translate($sale->customer->mobile,App::getLocale()) }}</td></tr>
+                                                @if($sale->customer->address)
+                                                <tr><td>{{ $sale->customer->address }}</td></tr>
+                                                @endif
+                                            </table>
+                                        </td>
+                                        <td width="30%">
+                                            <table>
+                                                <tr><td></td></tr>
+                                                <tr><td class="text-right"><b>{{ __('file.Invoice No.') }}</b></td><td><b>: </b>{{ translate($sale->invoice_no,App::getLocale()) }}</td></tr>
+                                                <tr><td class="text-right"><b>{{ __('file.Date') }}</b></td><td><b>: </b>{{ translate(date('d-m-Y',strtotime($sale->sale_date)),App::getLocale()) }}</td></tr>
+                                                <tr><td class="text-right"><b>{{ __('file.Payment Status') }}</b></td><td><b>: </b>{{ __('file.'.PAYMENT_STATUS[$sale->payment_status]) }}</td></tr>
+                                                @if($sale->payment_method)
+                                                <tr><td class="text-right">
+                                                    <b>{{ __('file.Payment Method') }}</b></td><td><b>: </b>{{ __('file.'.PAYMENT_METHOD[$sale->payment_method]) }}</td>
+                                                </tr>
+                                                @endif
+                                            </table>
                                         </td>
                                     </tr>
                                 </table>
-                                <div style="width: 100%;height:3px;border-top:1px solid #036;border-bottom:1px solid #036;"></div>
-                                <table>
-                                    <tr>
-                                        <td width="50%">
-                                            <div class="invoice-to">
-                                                <div class="text-grey-light"><b>{{__('file.INVOICE TO')}}</b></div>
-                                                <div class="to">{{ $sale->customer->company_name }}</div>
-                                                <div class="to">{{ $sale->customer->name }}</div>
-                                                <div class="phone">{{ $sale->customer->mobile }}</div>
-                                                @if($sale->customer->email)<div class="email">{{ $sale->customer->email }}</div>@endif
-                                                @if($sale->customer->address)<div class="address">{{ $sale->customer->address }}</div>@endif
-                                            </div>
-                                        </td>
-                                        <td width="50%" class="text-right">
-                                            <h4 class="name m-0">#{{ $sale->invoice_no }}</h4>
-                                            <div class="m-0 date"><b>{{__('file.Date')}}: </b>{{ date('d-M-Y',strtotime($sale->sale_date)) }}</div>
-                                            <div class="m-0 date"><b>{{__('file.Delivery Status')}}: </b>{{ $sale->delivery_status ? DELIVERY_STATUS[$sale->delivery_status] : 'N/A' }}</div>
-                                            <div class="m-0 date"><b>{{__('file.Delivery Date')}}:</b>{{ $sale->delivery_date ? date('d-M-Y',strtotime($sale->delivery_date)) : 'N/A' }}</div>
-                                            <div class="m-0 date"><b>{{__('file.Receive Status')}}: </b>{{ $sale->payment_status ? PAYMENT_STATUS[$sale->payment_status] : 'N/A' }}</div>
-                                            <div class="m-0 date"><b>{{__('file.Receive Method')}}: </b>{{ $sale->payment_method ? PAYMENT_METHOD[$sale->payment_method] : 'N/A' }}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <table border="0" cellspacing="0" cellpadding="0">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">{{__('file.SL')}}</th>
-                                            <th class="text-left">{{__('file.DESCRIPTION')}}</th>
-                                            <th class="text-center">{{__('file.QUANTITY')}}</th>
-                                            <th class="text-right">{{__('file.PRICE')}}</th>
-                                            <th class="text-right">{{__('file.DISCOUNT')}}</th>
-                                            <th class="text-right">{{__('file.SUBTOTAL')}}</th>
-                                        </tr>
-                                    </thead>
+
+                                <table  id='product_table'>
                                     <tbody>
-                                        @if (!$sale->sale_products->isEmpty())
-                                            @foreach ($sale->sale_products as $key => $item)
-                                                @php
-                                                    $unit_name = '';
-                                                    if($item->pivot->sale_unit_id)
-                                                    {
-                                                        $unit_name = DB::table('units')->where('id',$item->pivot->sale_unit_id)->value('unit_name');
-                                                    }
-                                                @endphp
+                                        <tr>
+                                            <td class="text-center"><b>{{ __('file.SL') }}</b></td>
+                                            <td class="text-left"><b>{{ __('file.Product') }}</b></td>
+                                            <td class="text-center"><b>{{ __('file.Vehicle No.') }}</b></td>
+                                            <td class="text-center"><b>{{ __('file.Challan No') }}</b></td>
+                                            <td class="text-center"><b>{{ __('file.Quantity') }}</b></td>
+                                            <td class="text-right"><b>{{ __('file.Price') }}</b></td>
+                                            <td class="text-right"><b>{{ __('file.Subtotal') }}</b></td>
+                                        </tr>
+                                        @if (!$sale->hasManyProducts->isEmpty())
+                                            @foreach ($sale->hasManyProducts as $key => $item)
                                                 <tr>
-                                                    <td class="text-center no">{{ $key+1 }}</td>
-                                                    <td class="text-left">{{ $item->name }}</td>
-                                                    <td class="text-center qty">{{ $item->pivot->qty.' '.$unit_name }}</td>
-                                                    <td class="text-right price">{{ number_format($item->pivot->net_unit_price,2) }}</td>
-                                                    <td class="text-right discount">{{ number_format($item->pivot->discount,2) }}</td>
-                                                    <td class="text-right total">
-                                                        @if (config('settings.currency_position') == 2)
-                                                            {{ number_format($item->pivot->total,2) }} {{ config('settings.currency_symbol') }}
-                                                        @else
-                                                            {{ config('settings.currency_symbol') }} {{ number_format($item->pivot->total,2) }}
-                                                        @endif
-                                                    </td>
+                                                    <td class="text-center">{{ translate($key+1,App::getLocale()) }}</td>
+                                                    <td class="text-left">{!! $item->product->name.' ('.$item->product->code.')' !!}</td>
+                                                    <td class="text-center">{{ $item->vehicle_no }}</td>
+                                                    <td class="text-center">{{ $item->challan_no }}</td>
+                                                    <td class="text-center">{{ translate($item->qty,App::getLocale()) }}</td>
+                                                    <td class="text-right">{{ translate(number_format($item->price,2,'.',','),App::getLocale()) }}</td>
+                                                    <td class="text-right"> {{ translate(number_format($item->total,2,'.',','),App::getLocale()) }} </td>
                                                 </tr>
                                             @endforeach
+                                            <tr>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Total') }}</b></td>
+                                                <td class="text-right"><b>{{ translate(number_format($sale->total_price,2,'.',','),App::getLocale()) }}</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Shipping Cost') }}</b></td>
+                                                <td class="text-right"><b> {{ translate(number_format($sale->shipping_cost,2,'.',','),App::getLocale()) }}</b></td>
+                                            </tr>
+    
+                                            <tr>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Grand Total') }}</b></td>
+                                                <td class="text-right"><b>{{ translate(number_format($sale->grand_total,2,'.',','),App::getLocale()) }}</b> </td>
+                                            </tr>
+    
+                                            <tr>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Paid Amount') }}</b></td>
+                                                <td class="text-right"> <b>{{ translate(number_format($sale->paid_amount,2,'.',','),App::getLocale()) }}</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Due Amount') }}</b></td>
+                                                <td class="text-right"> <b>{{ translate(number_format($sale->due_amount,2,'.',','),App::getLocale()) }}</b></td>
+                                            </tr>
+                                        @else
+                                            <tr><td Class="text-center" style="color:red;" colspan="7">No Data Found</td></tr>
                                         @endif
+                                        
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="4"></td>
-                                            <td  class="text-right">{{__('file.TOTAL')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->total_price,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->total_price,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4" class="text-left"><b>{{__('file.Vehicle No')}}.:</b></td>
-                                            <td  class="text-right">{{__('file.DISCOUNT')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->order_discount,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->order_discount,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4" class="text-left"><b>{{__('file.Driver Name')}}:</b></td>
-                                            <td  class="text-right">{{__('file.SHIPPING COST')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->shipping_cost,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->shipping_cost,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4"></td>
-                                            <td  class="text-right">{{__('file.GRAND TOTAL')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->grand_total,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->grand_total,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4"></td>
-                                            <td  class="text-right">{{__('file.PREVIOUS DUE')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->previous_due,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->previous_due,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4"></td>
-                                            <td  class="text-right">{{__('file.NET TOTAL')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format(($sale->grand_total + $sale->previous_due),2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format(($sale->grand_total + $sale->previous_due),2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4"></td>
-                                            <td  class="text-right">{{__('file.RECEIVED AMOUNT')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->paid_amount,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->paid_amount,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4"></td>
-                                            <td  class="text-right">{{__('file.DUE AMOUNT')}}</td>
-                                            <td class="text-right">
-                                                @if (config('settings.currency_position') == 2)
-                                                    {{ number_format($sale->due_amount,2) }} {{ config('settings.currency_symbol') }}
-                                                @else
-                                                    {{ config('settings.currency_symbol') }} {{ number_format($sale->due_amount,2) }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
+                                @if($sale->note)
                                 <table>
                                     <tr>
                                         <td>
-                                            <div class="thanks"><h4>{{__('file.Thank you!')}}</h4></div>
                                             <div class="notices">
-                                                <div>{{__('file.Note')}}:</div>
+                                                <div><b>{{ __('file.Note') }}:</b></div>
                                                 <div class="notice">{{ $sale->note }}</div>
                                             </div>
                                         </td>
                                     </tr>
                                 </table>
+                                @endif
                                 <table style="width: 100%;">
                                     <tr>
                                         <td class="text-center">
                                             <div class="font-size-10" style="width:250px;float:left;">
-                                                <p style="margin:0;padding:0;"></p>
+                                                <p style="margin:0;padding:0;"><b class="text-uppercase">{{ $sale->creator->name }}</b>
+                                                    <br> {{ translate(date('d-m-Y H:i:s',strtotime($sale->created_at)),App::getLocale()) }}</p>
                                                 <p class="dashed-border"></p>
-                                                <p style="margin:0;padding:0;">{{__('file.Received By')}}</p>
+                                                <p style="margin:0;padding:0;">{{ __('file.Created By') }}</p>
                                             </div>
                                         </td>
+
                                         <td class="text-center">
                                             <div class="font-size-10" style="width:250px;float:right;">
-                                                <p style="margin:35px 0 0 0;padding:0;"><b class="text-uppercase">{{ $sale->created_by }}</b><br> {{ date('d-M-Y h:i:s A',strtotime($sale->created_at)) }}</p>
+                                                <p style="margin:0;padding:0;"><b class="text-uppercase"></b></p>
                                                 <p class="dashed-border"></p>
-                                                <p style="margin:0;padding:0;">{{__('file.Generated By')}}</p>
+                                                <p style="margin:0;padding:0;">{{ __('file.Received By') }}</p>
                                             </div>
                                         </td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
-                        <!--***********************-->
                     </div>
+
                 </div>
             </div>
         </div>
@@ -472,6 +189,7 @@
     </div>
 </div>
 @endsection
+
 @push('scripts')
 <script src="{{asset('js/jquery.printarea.js')}}"></script>
 <script>
@@ -487,5 +205,6 @@ $(document).ready(function () {
         $("#invoice").printArea(options);
     });
 });
+
 </script>
 @endpush

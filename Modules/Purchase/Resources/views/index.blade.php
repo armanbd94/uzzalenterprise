@@ -85,7 +85,7 @@
                 <!--begin: Datatable-->
 
                     <div class="row">
-                        <div class="col-sm-12 table-responsive">
+                        <div class="col-sm-12">
                             <table id="dataTable" class="table table-bordered table-hover">
                                 <thead class="bg-primary">
                                     <tr>
@@ -146,7 +146,7 @@ $(document).ready(function(){
         "processing": true, //Feature control the processing indicator
         "serverSide": true, //Feature control DataTable server side processing mode
         "order": [], //Initial no order
-        "responsive": false, //Make table responsive in mobile device
+        "responsive": true, //Make table responsive in mobile device
         "bInfo": true, //TO show the total number of data
         "bFilter": false, //For datatable default search box show/hide
         "lengthMenu": [

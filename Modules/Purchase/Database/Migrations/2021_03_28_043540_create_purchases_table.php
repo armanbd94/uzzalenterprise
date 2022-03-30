@@ -21,7 +21,6 @@ class CreatePurchasesTable extends Migration
             $table->foreign('warehouse_id')->references('id')->on('warehouses');
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            
             $table->float('item');
             $table->float('total_qty');
             $table->double('total_cost');

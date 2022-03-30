@@ -47,7 +47,7 @@
                                 <label for="supplier_id" style="width: 100%;margin-bottom: 0.1rem;">
                                     <span class="float-left">{{__('file.Supplier')}}<b class="text-danger">*</b></span> 
                                     @if(permission('supplier-add'))<span class="float-right text-primary" style="cursor: pointer;"
-                                    onclick="showNewFormModal('Add New Supplier','Save')"><i class="fas fa-plus text-primary"></i> {{ __('file.Add New') }}</span>
+                                    onclick="showNewFormModal('{{ __('file.Add New Supplier') }}','{{ __('file.Save') }}')"><i class="fas fa-plus text-primary"></i> {{ __('file.Add New') }}</span>
                                     @endif
                                 </label>
                                 <select class="form-control selectpicker" name="supplier_id" id="supplier_id" data-live-search="true" ></select>          

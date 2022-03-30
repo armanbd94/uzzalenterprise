@@ -3,8 +3,6 @@
 namespace Modules\Purchase\Http\Controllers;
 
 use Exception;
-use App\Models\User;
-use App\Traits\UploadAble;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
@@ -20,7 +18,6 @@ use Modules\Purchase\Http\Requests\PurchaseFormRequest;
 class PurchaseController extends BaseController
 {
 
-    use UploadAble;
     public function __construct(Purchase $model)
     {
         $this->model = $model;
@@ -117,7 +114,7 @@ class PurchaseController extends BaseController
             $data = [
                 'warehouses' => Warehouse::activeWarehouses(),
                 'products'      => Product::where('status',1)->get(),
-                'memo_no' => date('ymdHi').rand(1,99)
+                'memo_no' => date('ymd').'-'.date('His')
             ];
             return view('purchase::create',$data);
         }else{
@@ -303,8 +300,8 @@ class PurchaseController extends BaseController
                     DB::beginTransaction();
                     try {
                         foreach ($request->ids as $id) {
-                            $purchaseData = Purchase::with('products')->find($id);
-                            if(!$purchaseData->products->isEmpty())
+                            $purchaseData = Purchase::with('purchase_products')->find($id);
+                            if(!$purchaseData->purchase_products->isEmpty())
                             {
                                 $remove_products = $this->model->purchase_products_remove($purchaseData);
                                 if($remove_products == false)

@@ -1641,6 +1641,8 @@ return [
     'From' => 'From',
     'To' => 'To',
     'Partial' => 'Partial',
+    'Total Price' => 'Total Price',
+    'Sale Invoice' => 'Sale Invoice',
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',

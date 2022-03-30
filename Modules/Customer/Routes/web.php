@@ -26,7 +26,7 @@ Route::group(['middleware' => ['auth','language']], function () {
         Route::get('group-data/{id}','CustomerController@groupData');
         Route::get('previous-balance/{id}', 'CustomerController@previous_balance');
     });
-    Route::post('route-id-wise-customer-list','CustomerController@route_id_wise_customer_list');
+    Route::post('customer-list','CustomerController@customer_list')->name('customer.list');
 
     //Customer Ledger Routes
     Route::get('customer-ledger', 'CustomerLedgerController@index')->name('customer.ledger');

@@ -112,6 +112,7 @@ class CustomerController extends BaseController
                     $collection   = $this->track_data($collection,$request->update_id);
                     $customer     = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
                     $output       = $this->store_message($customer, $request->update_id);
+                    $output['id']  = $customer->id;
                     if($request->update_id)
                     {
                         $new_head_name = $request->name;
@@ -356,5 +357,22 @@ class CustomerController extends BaseController
                 ->first();
         $balance = $data ? $data->balance : 0;
         return  response()->json($balance);
+    }
+
+    public function customer_list(Request $request)
+    {
+        if($request->ajax()){
+            $customers = DB::table('customers')
+                    ->select('id','name','mobile')
+                    ->get();
+                    $output = '<option value="">Select Please</option>';
+            if(!$customers->isEmpty())
+            {
+                foreach ($customers as $key => $value) {
+                    $output .= '<option value="'.$value->id.'">'.$value->name.' - '.translate($value->mobile,App::getLocale()).'</option>';
+                }
+            }
+            return $output;
+        }
     }
 }

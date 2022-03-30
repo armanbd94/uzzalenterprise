@@ -1,8 +1,14 @@
 @extends('layouts.app')
 @section('title', $page_title)
 @push('styles')
-<link href="{{asset('css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('css/daterangepicker.min.css')}}" rel="stylesheet" type="text/css" />
+<style>
+    #dataTable{
+        /* width: 2000px !important; */
+    }
+</style>
 @endpush
+
 @section('content')
 <div class="d-flex flex-column-fluid">
     <div class="container-fluid">
@@ -14,8 +20,10 @@
                 </div>
                 <div class="card-toolbar">
                     <!--begin::Button-->
+                    @if (permission('sale-add'))
                     <a href="{{ route('sale.add') }}"  class="btn btn-primary btn-sm font-weight-bolder">
                         <i class="fas fa-plus-circle"></i>{{__('file.Add New')}}</a>
+                        @endif
                     <!--end::Button-->
                 </div>
             </div>
@@ -26,50 +34,44 @@
             <div class="card-header flex-wrap py-5">
                 <form method="POST" id="form-filter" class="col-md-12 px-0">
                     <div class="row">
-                        <x-form.textbox labelName="{{__('file.Invoice No')}}." name="invoice_no" col="col-md-3" />
                         <div class="form-group col-md-3">
-                            <label for="from_date">{{__('file.From Date')}}</label>
-                            <input type="text" class="form-control date" name="from_date" id="from_date" readonly />
+                            <label for="name">{{__('file.Choose Your Date')}}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control daterangepicker-filed">
+                                <input type="hidden" id="from_date" name="from_date" >
+                                <input type="hidden" id="to_date" name="to_date" >
+                            </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="to_date">{{__('file.To Date')}}</label>
-                            <input type="text" class="form-control date" name="to_date" id="to_date" readonly />
-                        </div>
+                        <x-form.textbox labelName="{{__('file.Invoice No.')}}" name="invoice_no" col="col-md-3" />
                         <x-form.selectbox labelName="{{__('file.Warehouse')}}" name="warehouse_id" col="col-md-3" class="selectpicker">
                             @if (!$warehouses->isEmpty())
-                                @foreach ($warehouses as $value)
-                                    <option value="{{ $value->id }}">{{ $value->name }}</option>
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                                 @endforeach
                             @endif
                         </x-form.selectbox>
                         <x-form.selectbox labelName="{{__('file.Customer')}}" name="customer_id" col="col-md-3" class="selectpicker">
                             @if (!$customers->isEmpty())
-                                @foreach ($customers as $value)
-                                    <option value="{{ $value->id }}">{{ $value->name.' - '.$value->mobile }}</option>
+                                @foreach ($customers as $customer)
+                                    <option value="{{ $customer->id }}">{{  $customer->name.' - '.$customer->mobile  }}</option>
                                 @endforeach
                             @endif
                         </x-form.selectbox>
+                        
+
                         <x-form.selectbox labelName="{{__('file.Payment Status')}}" name="payment_status" col="col-md-3" class="selectpicker">
                             @foreach (PAYMENT_STATUS as $key => $value)
                                 <option value="{{ $key }}">{{ $value }}</option>
                             @endforeach
                         </x-form.selectbox>
-                        <x-form.selectbox labelName="{{__('file.Approval Status')}}" name="status" col="col-md-3" class="selectpicker">
-                            @foreach (APPROVE_STATUS as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
-                            @endforeach
-                        </x-form.selectbox>
-                        <x-form.selectbox labelName="{{__('file.Delivery Status')}}" name="delivery_status" col="col-md-3" class="selectpicker">
-                            @foreach (DELIVERY_STATUS as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
-                            @endforeach
-                        </x-form.selectbox>
-                        <div class="col-md-12">
+
+                        <div class="col-md-9">
                             <div style="margin-top:28px;">
                                 <div style="margin-top:28px;">
                                     <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
                                     data-toggle="tooltip" data-theme="dark" title="{{__('file.Reset')}}">
                                     <i class="fas fa-undo-alt"></i></button>
+
                                     <button id="btn-filter" class="btn btn-primary btn-sm btn-elevate btn-icon mr-2 float-right" type="button"
                                     data-toggle="tooltip" data-theme="dark" title="{{__('file.Search')}}">
                                     <i class="fas fa-search"></i></button>
@@ -81,69 +83,70 @@
             </div>
             <div class="card-body">
                 <!--begin: Datatable-->
-                <div id="kt_datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="table-responsive">
-                                <table id="dataTable" class="table table-bordered table-hover">
-                                    <thead class="bg-primary">
-                                        <tr>
-                                            @if (permission('sale-bulk-delete'))
-                                            <th>
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input" id="select_all" onchange="select_all()">
-                                                    <label class="custom-control-label" for="select_all"></label>
-                                                </div>
-                                            </th>
-                                            @endif
-                                            <th>{{__('file.SL')}}</th>
-                                            <th>{{__('file.Invoice No')}}.</th>
-                                            <th>{{__('file.Warehouse')}}</th>
-                                            <th>{{__('file.Customer Name')}}</th>
-                                            <th>{{__('file.Total Item')}}</th>
-                                            <th>{{__('file.Total')}}</th>
-                                            <th>{{__('file.Discount')}}</th>
-                                            <th>{{__('file.Shipping Cost')}}</th>
-                                            <th>{{__('file.Grand Total')}}</th>
-                                            <th>{{__('file.Previous Due')}}</th>
-                                            <th>{{__('file.Net Total')}}</th>
-                                            <th>{{__('file.Receive Amount')}}</th>
-                                            <th>{{__('file.Due Amount')}}</th>
-                                            <th>{{__('file.Sale Date')}}</th>
-                                            <th>{{__('file.Receive Status')}}</th>
-                                            <th>{{__('file.Approval Status')}}</th>
-                                            <th>{{__('file.Receive Method')}}</th>
-                                            <th>{{__('file.Deliver Status')}}</th>
-                                            <th>{{__('file.Delivery Date')}}</th>
-                                            <th>{{__('file.Action')}}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
+                            <table id="dataTable" class="table table-bordered table-hover">
+                                <thead class="bg-primary">
+                                    <tr>
+                                        @if (permission('sale-bulk-delete'))
+                                        <th>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="select_all" onchange="select_all()">
+                                                <label class="custom-control-label" for="select_all"></label>
+                                            </div>
+                                        </th>
+                                        @endif
+                                        <th>{{__('file.SL')}}</th>
+                                        <th>{{__('file.Sale Date')}}</th>
+                                        <th>{{__('file.Invoice No.')}}</th>
+                                        <th>{{__('file.Warehouse Name')}}</th>
+                                        <th>{{__('file.Customer Name')}}</th>
+                                        <th>{{__('file.Total Item')}}</th>
+                                        <th>{{__('file.Total Price')}}</th>
+                                        <th>{{__('file.Shipping Cost')}}</th>
+                                        <th>{{__('file.Grand Total')}}</th>
+                                        <th>{{__('file.Paid Amount')}}</th>
+                                        <th>{{__('file.Due Amount')}}</th>
+                                        <th>{{__('file.Payment Status')}}</th>
+                                        <th>{{__('file.Account Head')}}</th>
+                                        <th>{{__('file.Action')}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
-                </div>
                 <!--end: Datatable-->
             </div>
         </div>
         <!--end::Card-->
     </div>
 </div>
-@include('sale::delivery-modal')
-@include('sale::status-modal')
 @endsection
+
 @push('scripts')
-<script src="{{asset('js/bootstrap-datetimepicker.min.js')}}"></script>
+<script src="{{asset('js/knockout-3.4.2.js')}}"></script>
+<script src="{{asset('js/daterangepicker.min.js')}}"></script>
 <script>
 var table;
+$("#kt_body").addClass("aside-minimize");
 $(document).ready(function(){
-    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
+    $('.daterangepicker-filed').daterangepicker({
+        callback: function(startDate, endDate, period){
+            var start_date = startDate.format('YYYY-MM-DD');
+            var end_date   = endDate.format('YYYY-MM-DD');
+            var title = start_date + ' To ' + end_date;
+            $(this).val(title);
+            $('input[name="from_date"]').val(start_date);
+            $('input[name="to_date"]').val(end_date);
+        }
+    });
     table = $('#dataTable').DataTable({
         "processing": true, //Feature control the processing indicator
         "serverSide": true, //Feature control DataTable server side processing mode
         "order": [], //Initial no order
-        "responsive": false, //Make table responsive in mobile device
+        "responsive": true, //Make table responsive in mobile device
         "bInfo": true, //TO show the total number of data
         "bFilter": false, //For datatable default search box show/hide
         "lengthMenu": [
@@ -151,6 +154,7 @@ $(document).ready(function(){
             [5, 10, 15, 25, 50, 100, 1000, 10000, "All"]
         ],
         "pageLength": 25, //number of data show per page
+
         "language": {
             processing: `<i class="fas fa-spinner fa-spin fa-3x fa-fw text-primary"></i> `,
             emptyTable: '<strong class="text-danger">{{__('file.No Data Found')}}</strong>',
@@ -161,49 +165,47 @@ $(document).ready(function(){
             "url": "{{route('sale.datatable.data')}}",
             "type": "POST",
             "data": function (data) {
-                data.invoice_no       = $("#form-filter #invoice_no").val();
+                data.invoice_no      = $("#form-filter #invoice_no").val();
+                data.warehouse_id    = $("#form-filter #warehouse_id option:selected").val();
+                data.customer_id     = $("#form-filter #customer_id option:selected").val();
                 data.from_date       = $("#form-filter #from_date").val();
                 data.to_date         = $("#form-filter #to_date").val();
-                data.warehouse_id     = $("#form-filter #warehouse_id option:selected").val();
-                data.customer_id     = $("#form-filter #customer_id option:selected").val();
-                data.payment_status  = $("#form-filter #payment_status option:selected").val();
-                data.status          = $("#form-filter #status option:selected").val();
-                data.delivery_status = $("#form-filter #delivery_status option:selected").val();
+                data.payment_status  = $("#form-filter #payment_status").val();
                 data._token          = _token;
             }
         },
         "columnDefs": [{
-                @if(permission('sale-bulk-delete'))
-                "targets": [0,20],
+                @if (permission('sale-bulk-delete'))
+                "targets": [0,14],
                 @else
-                "targets": [19],
+                "targets": [13],
                 @endif
                 "orderable": false,
                 "className": "text-center"
             },
             {
-                @if(permission('sale-bulk-delete'))
-                "targets": [1,2,3,5,14,15,16,17,18,19],
+                @if (permission('sale-bulk-delete'))
+                "targets": [1,2,3,4,6,12,13],
                 @else
-                "targets": [0,1,2,4,13,14,15,16,17,18],
+                "targets": [0,1,2,3,5,11,12],
                 @endif
                 "className": "text-center"
             },
             {
-                @if(permission('sale-bulk-delete'))
-                "targets": [6,7,8,9,10,11,12,13],
+                @if (permission('sale-bulk-delete'))
+                "targets": [7,8,9,10,11],
                 @else
-                "targets": [5,6,7,8,9,10,11,12],
+                "targets": [6,7,8,9,10],
                 @endif
                 "className": "text-right"
             },
+
         ],
         "dom": "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6' <'float-right'B>>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'<'float-right'p>>>",
 
         "buttons": [
-            @if(permission('sale-report'))
             {
                 'extend':'colvis','className':'btn btn-secondary btn-sm text-white','text':'{{__('file.Column')}}','columns': ':gt(0)'
             },
@@ -213,12 +215,12 @@ $(document).ready(function(){
                 'className':'btn btn-secondary btn-sm text-white',
                 "title": "{{ $page_title }} List",
                 "orientation": "landscape", //portrait
-                "pageSize": "legal", //A3,A5,A6,legal,letter
+                "pageSize": "A4", //A3,A5,A6,legal,letter
                 "exportOptions": {
-                    @if(permission('sale-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(20))'
+                    @if (permission('sale-bulk-delete'))
+                    columns: ':visible:not(:eq(0),:eq(14))'
                     @else
-                    columns: ':visible:not(:eq(19))'
+                    columns: ':visible:not(:eq(13))'
                     @endif
                 },
                 customize: function (win) {
@@ -237,10 +239,10 @@ $(document).ready(function(){
                 "title": "{{ $page_title }} List",
                 "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                 "exportOptions": {
-                   @if(permission('sale-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(20))'
+                    @if (permission('sale-bulk-delete'))
+                    columns: ':visible:not(:eq(0),:eq(14))'
                     @else
-                    columns: ':visible:not(:eq(19))'
+                    columns: ':visible:not(:eq(13))'
                     @endif
                 }
             },
@@ -251,10 +253,10 @@ $(document).ready(function(){
                 "title": "{{ $page_title }} List",
                 "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                 "exportOptions": {
-                   @if(permission('sale-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(20))'
+                    @if (permission('sale-bulk-delete'))
+                    columns: ':visible:not(:eq(0),:eq(14))'
                     @else
-                    columns: ':visible:not(:eq(19))'
+                    columns: ':visible:not(:eq(13))'
                     @endif
                 }
             },
@@ -265,12 +267,12 @@ $(document).ready(function(){
                 "title": "{{ $page_title }} List",
                 "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                 "orientation": "landscape", //portrait
-                "pageSize": "legal", //A3,A5,A6,legal,letter
+                "pageSize": "A4", //A3,A5,A6,legal,letter
                 "exportOptions": {
-                   @if(permission('sale-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(20))'
+                    @if (permission('sale-bulk-delete'))
+                    columns: ':visible:not(:eq(0),:eq(14))'
                     @else
-                    columns: ':visible:not(:eq(19))'
+                    columns: ':visible:not(:eq(13))'
                     @endif
                 },
                 customize: function(doc) {
@@ -279,7 +281,6 @@ $(document).ready(function(){
                     doc.pageMargins = [5,5,5,5];
                 }
             },
-            @endif
             @if (permission('sale-bulk-delete'))
             {
                 'className':'btn btn-danger btn-sm delete_btn d-none text-white',
@@ -291,75 +292,19 @@ $(document).ready(function(){
             @endif
         ],
     });
+
     $('#btn-filter').click(function () {
         table.ajax.reload();
     });
+
     $('#btn-reset').click(function () {
         $('#form-filter')[0].reset();
+        $('#form-filter #from_date').val('');
+        $('#form-filter #to_date').val('');
         $('#form-filter .selectpicker').selectpicker('refresh');
         table.ajax.reload();
     });
-    //Add Delivery
-    $(document).on('click', '.add_delivery', function () {
-        let id              = $(this).data('id');
-        let delivery_status = $(this).data('status');
-        let delivery_date   = $(this).data('date');
-        $('#delivery_form')[0].reset();
-        $('#delivery_form').find('.is-invalid').removeClass('is-invalid');
-        $('#delivery_form').find('.error').remove();
-        $('.selectpicker').selectpicker('refresh');
-        $('#delivery_modal #sale_id').val(id);
-        $('#delivery_modal #delivery_status').val(delivery_status);
-        $('#delivery_modal #delivery_date').val(delivery_date);
-        $('.selectpicker').selectpicker('refresh');
-        $('#delivery_modal').modal({
-            keyboard: false,
-            backdrop: 'static',
-        });
-        $('#delivery_modal .modal-title').html( '<i class="fas fa-truck"></i> <span>{{__('file.Add Delivery')}}</span>');
-    });
-    $(document).on('click','#delivery-save-btn', function(e){
-        e.preventDefault();
-        let form = document.getElementById('delivery_form');
-        let formData = new FormData(form);
-        $.ajax({
-            url: "{{route('sale.delivery.update')}}",
-            type: "POST",
-            data: formData,
-            dataType: "JSON",
-            contentType: false,
-            processData: false,
-            cache: false,
-            beforeSend: function(){
-                $('#delivery-save-btn').addClass('kt-spinner kt-spinner--md kt-spinner--light');
-            },
-            complete: function(){
-                $('#delivery-save-btn').removeClass('kt-spinner kt-spinner--md kt-spinner--light');
-            },
-            success: function (data) {
-                $('#delivery_form').find('.is-invalid').removeClass('is-invalid');
-                $('#delivery_form').find('.error').remove();
-                if (data.status == false) {
-                    $.each(data.errors, function (key, value) {
-                        var key = key.split('.').join('_');
-                        $('#delivery_form input#' + key).addClass('is-invalid');
-                        $('#delivery_form select#' + key).parent().addClass('is-invalid');
-                        $('#delivery_form #' + key).parent().append(
-                        '<small class="error text-danger">' + value + '</small>');
-                    });
-                } else {
-                    notification(data.status, data.message);
-                    if (data.status == 'success') {
-                        table.ajax.reload(null, false);
-                        $('#delivery_modal').modal('hide');
-                    }
-                }
-            },
-            error: function (xhr, ajaxOption, thrownError) {
-                console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
-            }
-        });
-    });
+
     $(document).on('click', '.delete_data', function () {
         let id    = $(this).data('id');
         let name  = $(this).data('name');
@@ -367,6 +312,7 @@ $(document).ready(function(){
         let url   = "{{ route('sale.delete') }}";
         delete_data(id, url, table, row, name);
     });
+
     function multi_delete(){
         let ids = [];
         let rows;
@@ -386,48 +332,9 @@ $(document).ready(function(){
             bulk_delete(ids,url,table,rows);
         }
     }
-     //Show Status Change Modal
-    $(document).on('click','.change_status',function(){
-        $('#approve_status_form #sale_id').val($(this).data('id'));
-        $('#approve_status_form #sale_status').val($(this).data('status'));
-        $('#approve_status_form #sale_status.selectpicker').selectpicker('refresh');
-        $('#approve_status_modal').modal({
-            keyboard: false,
-            backdrop: 'static',
-        });
-        $('#approve_status_modal .modal-title').html('<span>{{__('file.Change Sale Status')}}</span>');
-        $('#approve_status_modal #status-btn').text('{{__('file.Change Status')}}');
 
-    });
-    $(document).on('click','#status-btn',function(){
-        var sale_id     = $('#approve_status_form #sale_id').val();
-        var sale_status =  $('#approve_status_form #sale_status option:selected').val();
-        if(sale_id && sale_status)
-        {
-            $.ajax({
-                url: "{{route('sale.change.status')}}",
-                type: "POST",
-                data: {sale_id:sale_id,sale_status:sale_status,_token:_token},
-                dataType: "JSON",
-                beforeSend: function(){
-                    $('#status-btn').addClass('kt-spinner kt-spinner--md kt-spinner--light');
-                },
-                complete: function(){
-                    $('#status-btn').removeClass('kt-spinner kt-spinner--md kt-spinner--light');
-                },
-                success: function (data) {
-                    notification(data.status, data.message);
-                    if (data.status == 'success') {
-                        $('#approve_status_modal').modal('hide');
-                        table.ajax.reload(null, false);
-                    }
-                },
-                error: function (xhr, ajaxOption, thrownError) {
-                    console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
-                }
-            });
-        }
-    });
+
+
 });
 </script>
 @endpush

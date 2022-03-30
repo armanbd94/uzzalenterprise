@@ -119,26 +119,26 @@
                                                 </tr>
                                             @endforeach
                                             <tr>
-                                                <td colspan="6"  class="text-right">{{ __('file.Total') }}</td>
-                                                <td class="text-right">{{ translate(number_format($purchase->total_cost,2,'.',','),App::getLocale()) }}</td>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Total') }}</b></td>
+                                                <td class="text-right"><b>{{ translate(number_format($purchase->total_cost,2,'.',','),App::getLocale()) }}</b></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="6"  class="text-right">{{ __('file.Shipping Cost') }}</td>
-                                                <td class="text-right"> {{ translate(number_format($purchase->shipping_cost,2,'.',','),App::getLocale()) }}</td>
-                                            </tr>
-    
-                                            <tr>
-                                                <td colspan="6"  class="text-right">{{ __('file.Grand Total') }}</td>
-                                                <td class="text-right">{{ translate(number_format($purchase->grand_total,2,'.',','),App::getLocale()) }} </td>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Shipping Cost') }}</b></td>
+                                                <td class="text-right"><b> {{ translate(number_format($purchase->shipping_cost,2,'.',','),App::getLocale()) }}</b></td>
                                             </tr>
     
                                             <tr>
-                                                <td colspan="6"  class="text-right">{{ __('file.Paid Amount') }}</td>
-                                                <td class="text-right"> {{ translate(number_format($purchase->paid_amount,2,'.',','),App::getLocale()) }}</td>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Grand Total') }}</b></td>
+                                                <td class="text-right"><b>{{ translate(number_format($purchase->grand_total,2,'.',','),App::getLocale()) }}</b> </td>
+                                            </tr>
+    
+                                            <tr>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Paid Amount') }}</b></td>
+                                                <td class="text-right"> <b>{{ translate(number_format($purchase->paid_amount,2,'.',','),App::getLocale()) }}</b></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="6"  class="text-right">{{ __('file.Due Amount') }}</td>
-                                                <td class="text-right"> {{ translate(number_format($purchase->due_amount,2,'.',','),App::getLocale()) }}</td>
+                                                <td colspan="6"  class="text-right"><b>{{ __('file.Due Amount') }}</b></td>
+                                                <td class="text-right"> <b>{{ translate(number_format($purchase->due_amount,2,'.',','),App::getLocale()) }}</b></td>
                                             </tr>
                                         @else
                                             <tr><td Class="text-center" style="color:red;" colspan="7">No Data Found</td></tr>
