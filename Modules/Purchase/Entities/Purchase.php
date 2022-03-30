@@ -295,4 +295,33 @@ class Purchase extends BaseModel
         }
         return $transaction;
     }
+
+
+    public function purchase_products_remove($purchaseData)
+    {
+        
+        foreach ($purchaseData->purchase_products as  $product) {
+
+            $received_qty = $product->pivot->qty;
+            $product_data = Product::find($product->id);
+            if($product_data)
+            {
+                $product_data->qty -= $received_qty;
+                $product_data->cost = $product->pivot->current_unit_cost;
+                $product_data->old_cost = $product->pivot->old_unit_cost;
+                $product_data->update();
+            }
+            $warehouse_product = WarehouseProduct::where([
+                'warehouse_id'=>$purchaseData->warehouse_id,
+                'product_id'=>$product->id])->first();
+            if($warehouse_product)
+            {
+                $warehouse_product->qty -= $received_qty;
+                $warehouse_product->update();
+            }
+        
+        }
+        return $purchaseData->purchase_products()->detach();
+        
+    }
 }

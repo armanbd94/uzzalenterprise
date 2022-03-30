@@ -182,9 +182,6 @@
 <script src="{{asset('js/jquery-ui.js')}}"></script>
 <script src="{{asset('js/bootstrap-datetimepicker.min.js')}}"></script>
 <script>
-function _(x){
-    return document.getElementById(x);
-}
 $("#kt_body").addClass("aside-minimize");
 $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD'});

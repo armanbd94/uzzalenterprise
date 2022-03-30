@@ -27,19 +27,19 @@
             <div class="card-body">
                 <!--begin: Datatable-->
                 <div id="kt_datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
-                    <form action="" id="purchase_store_form" method="post" enctype="multipart/form-data">
+                    <form action="" id="purchase_update_form" method="post" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="purchase_id">
+                        <input type="hidden" name="purchase_id" value="{{ $purchase->id }}">
                         <div class="row">
                             <div class="form-group col-md-3 required">
                                 <label for="chalan_no">{{__('file.Memo No.')}}</label>
-                                <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{ isset($purchase_data) ? $purchase_data['purchase']['memo_no'] : $memo_no }}" readonly />
+                                <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{ $purchase->memo_no }}" readonly />
                             </div>
-                            <x-form.textbox labelName="{{__('file.Purchase Date')}}" name="purchase_date" value="{{ isset($purchase_data) ? $purchase_data['purchase']['purchase_date'] : date('Y-m-d') }}" required="required" class="date" col="col-md-3"/>
+                            <x-form.textbox labelName="{{__('file.Purchase Date')}}" name="purchase_date" value="{{ $purchase->purchase_date }}" required="required" class="date" col="col-md-3"/>
                             <x-form.selectbox labelName="{{__('file.Warehouse')}}" name="warehouse_id" required="required" col="col-md-3" class="selectpicker">
                                 @if (!$warehouses->isEmpty())
                                 @foreach ($warehouses as $key => $warehouse)
-                                    <option value="{{ $warehouse->id }}"  @if(isset($purchase_data)) {{ ($purchase_data['purchase']['warehouse_id'] == $warehouse->id) ? 'selected' : ''}} @else {{ $key == 0 ? 'selected' : '' }} @endif>{{ $warehouse->name }}</option>
+                                    <option value="{{ $warehouse->id }}"  {{ $purchase->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
                                 @endforeach
                                 @endif
                             </x-form.selectbox>
@@ -66,41 +66,47 @@
                                         <th></th>
                                     </thead>
                                     <tbody>
+                                    @if(!$purchase->hasManyProducts->isEmpty())
+                                        @foreach ($purchase->hasManyProducts as $key => $item)
                                         <tr>
                                             <td class="col-md-3">                                                  
-                                                <select name="products[1][id]" id="products_1_id" class="fcs col-md-12 form-control selectpicker"  data-live-search="true" data-row="1">                                            
+                                                <select name="products[{{ $key+1 }}][id]" id="products_{{ $key+1 }}_id" class="fcs col-md-12 form-control selectpicker"  data-live-search="true" data-row="{{ $key+1 }}">                                            
                                                     @if (!$products->isEmpty())
                                                         <option value="0">Please Select</option>
                                                     @foreach ($products as $product)
-                                                        <option value="{{ $product->id }}">{{ $product->name.' ('.$product->code.')' }}</option>
+                                                        <option value="{{ $product->id }}" {{ $item->product_id == $product->id ? 'selected' : '' }}>{{ $product->name.' ('.$product->code.')' }}</option>
                                                     @endforeach
                                                     @endif
                                                 </select> 
                                             </td>                                        
+                                            <td><input type="text" class="form-control vehicle_no text-left" value="{{ $item->vehicle_no }}" name="products[{{ $key+1 }}][vehicle_no]" id="products_{{ $key+1 }}_vehicle_no"  data-row="{{ $key+1 }}"></td>
+                                            <td><input type="text" class="form-control text-left" value="{{ $item->challan_no }}" name="products[{{ $key+1 }}][challan_no]" id="products_{{ $key+1 }}_challan_no"  data-row="{{ $key+1 }}"></td>
+                                            <td><input type="text" class="form-control qty text-center" value="{{ $item->qty }}" onkeyup="calculateRowTotal({{ $key+1 }})" name="products[{{ $key+1 }}][qty]" id="products_{{ $key+1 }}_qty"  data-row="{{ $key+1 }}"></td>
+                                            <td><input type="text" class="text-right form-control net_unit_cost" value="{{ $item->net_unit_cost }}" onkeyup="calculateRowTotal({{ $key+1 }})" name="products[{{ $key+1 }}][net_unit_cost]" id="products_{{ $key+1 }}_net_unit_cost" data-row="{{ $key+1 }}"></td>
+                                            <td class="subtotal_{{ $key+1 }} text-right" data-row="{{ $key+1 }}">{{ number_format($item->total,2,'.','') }}</td>
                                             <td>
-                                                <input type="text" class="form-control vehicle_no text-left" name="products[1][vehicle_no]" id="products_1_vehicle_no"  data-row="1">
+                                                @if ($key != 0)
+                                                <button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button>
+                                                @endif
                                             </td>
-                                            <td><input type="text" class="form-control text-left" name="products[1][challan_no]" id="products_1_challan_no"  data-row="1"></td>
-                                            <td><input type="text" class="form-control qty text-center" onkeyup="calculateRowTotal(1)" name="products[1][qty]" id="products_1_qty"  data-row="1"></td>
-                                            <td><input type="text" class="text-right form-control net_unit_cost" onkeyup="calculateRowTotal(1)" name="products[1][net_unit_cost]" id="products_1_net_unit_cost" data-row="1"></td>
-                                            <td class="subtotal_1 text-right" data-row="1"></td>
-                                            <td></td>
-                                            <input type="hidden" class="subtotal" id="products_1_subtotal" name="products[1][subtotal]" data-row="1">
-                                       </tr>
+                                            <input type="hidden" class="subtotal" value="{{ $item->total }}" id="products_{{ $key+1 }}_subtotal" name="products[{{ $key+1 }}][subtotal]" data-row="{{ $key+1 }}">
+                                        </tr>
+                                        @endforeach
+                                    @endif
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="3" class="font-weight-bolder">{{ __('file.Total') }}</td>
-                                            <td id="total-qty" class="text-center font-weight-bolder">0</td>
+                                            <td id="total-qty" class="text-center font-weight-bolder">{{ $purchase->total_qty }}</td>
                                             <td></td>
-                                            <td id="total" class="text-right font-weight-bolder">0.00</td>
+                                            <td id="total" class="text-right font-weight-bolder">{{ number_format($purchase->total_cost,2,'.','') }}</td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-success btn-sm add-product"><i class="fas fa-plus"></i></button>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="text-right font-weight-bolder" colspan="5">{{ __('file.Shipping Cost') }}</td>
-                                            <td><input type="text" class="fcs form-control text-right" name="shipping_cost" id="shipping_cost" onkeyup="calculateNetTotal()" placeholder="0.00"></td>
+                                            <td><input type="text" class="fcs form-control text-right" value="{{ $purchase->shipping_cost }}" name="shipping_cost" id="shipping_cost" onkeyup="calculateNetTotal()" placeholder="0.00"></td>
                                             <td></td>
                                         </tr>
                                         <tr>
@@ -108,41 +114,41 @@
                                                 <div class="row">
                                                     <x-form.selectbox labelName="{{ __('file.Payment Status') }}" name="payment_status" required="required"  col="col-md-6 mb-0" class="fcs selectpicker" data-live-search="true">
                                                         @foreach (PAYMENT_STATUS as $key => $value)
-                                                        <option value="{{ $key }}">{{ $value }}</option>
+                                                        <option value="{{ $key }}" {{ $key == $purchase->payment_status ? 'selected' : '' }}>{{ $value }}</option>
                                                         @endforeach
                                                     </x-form.selectbox>
-                                                    <x-form.selectbox labelName="{{ __('file.Payment Method') }}" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-6 payment_row d-none" class="selectpicker" data-live-search="true">
+                                                    <x-form.selectbox labelName="{{ __('file.Payment Method') }}" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-6 payment_row {{ $purchase->payment_status != 3 ? '' : 'd-none' }}" class="selectpicker" data-live-search="true">
                                                         @foreach (SALE_PAYMENT_METHOD as $key => $value)
-                                                        <option value="{{ $key }}">{{ $value }}</option>
+                                                        <option value="{{ $key }}" {{ $purchase->payment_method == $key ? 'selected' : '' }}>{{ $value }}</option>
                                                         @endforeach
                                                     </x-form.selectbox>
                                                 </div>
                                             </td>
                                             <td class="text-right font-weight-bolder">{{ __('file.Grand Total') }}</td>
-                                            <td><input type="text" class="fcs form-control text-right bg-secondary" name="grand_total" id="grand_total" placeholder="0.00" readonly></td>
+                                            <td><input type="text" class="fcs form-control text-right bg-secondary" value="{{ $purchase->grand_total }}" name="grand_total" id="grand_total" placeholder="0.00" readonly></td>
                                             <td></td>
                                         </tr>
                                         <tr>
                                             <td colspan="4">
-                                                <div class="row payment_row d-none">
+                                                <div class="row payment_row {{ $purchase->payment_status != 3 ? '' : 'd-none' }}">
                                                     <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-6" class="fcs selectpicker"/>
-                                                    <div class="form-group col-md-6 d-none reference_no">
+                                                    <div class="form-group col-md-6 {{ $purchase->payment_method != 1 ? '': 'd-none'}} reference_no">
                                                         <label for="reference_no">{{ __('file.Reference No.') }}</label>
-                                                        <input type="text" class="fcs form-control" name="reference_no" id="reference_no">
+                                                        <input type="text" class="fcs form-control" value="{{ $purchase->reference_no }}" name="reference_no" id="reference_no">
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="text-right font-weight-bolder">{{ __('file.Paid Amount') }}</td>
                                             <td>
                                                 <div class="form-group mb-0">
-                                                <input type="text" class="fcs form-control text-right" name="paid_amount" id="paid_amount" onkeyup="calculateNetTotal()" placeholder="0.00">
+                                                <input type="text" class="fcs form-control text-right" value="{{ $purchase->paid_amount }}" name="paid_amount" id="paid_amount" onkeyup="calculateNetTotal()" placeholder="0.00">
                                                 </div>
                                             </td>
                                             <td></td>
                                         </tr>
                                         <tr>
                                             <td class="text-right font-weight-bolder" colspan="5">{{ __('file.Due Amount') }}</td>
-                                            <td><input type="text" class="fcs form-control bg-secondary text-right" name="due_amount" id="due_amount" placeholder="0.00" readonly></td>
+                                            <td><input type="text" class="fcs form-control bg-secondary text-right" value="{{ $purchase->due_amount }}" name="due_amount" id="due_amount" placeholder="0.00" readonly></td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -152,19 +158,19 @@
 
                             <div class="form-group col-md-12">
                                 <label for="note">{{__('file.Note')}}</label>
-                                <textarea  class="form-control" name="note" id="note" cols="30" rows="3">{{ isset($purchase_data) ? $purchase_data['purchase']['note'] : '' }}</textarea>
+                                <textarea  class="form-control" name="note" id="note" cols="30" rows="3">{{ $purchase->note }}</textarea>
                             </div>
 
 
 
                             <div class="col-md-12">
-                                <input type="hidden" name="total_qty" value="{{ isset($purchase_data) ? $purchase_data['purchase']['total_qty']: '' }}">
-                                <input type="hidden" name="total_cost" id="total_cost" value="{{ isset($purchase_data) ? $purchase_data['purchase']['total_cost']: '' }}">
-                                <input type="hidden" name="item" value="{{ isset($purchase_data) ? $purchase_data['purchase']['item']: '' }}">
+                                <input type="hidden" name="total_qty" value="{{$purchase->total_qty }}">
+                                <input type="hidden" name="total_cost" id="total_cost" value="{{$purchase->total_cost }}">
+                                <input type="hidden" name="item" value="{{$purchase->item }}">
                             </div>
                             <div class="form-grou col-md-12 text-center pt-5">
-                                <button type="button" class="btn btn-danger btn-sm mr-3"><i class="fas fa-sync-alt"></i>{{__('file.Reset')}}</button>
-                                <button type="button" class="btn btn-primary btn-sm mr-3" id="purchase-save-btn" onclick="store_data()"><i class="fas fa-save"></i>{{__('file.Save')}}</button>
+                                <a href="{{ route('purchase') }}" class="btn btn-danger btn-sm mr-3"><i class="fas fa-window-close"></i>{{__('file.Cancel')}}</a>
+                                <button type="button" class="btn btn-primary btn-sm mr-3" id="purchase-save-btn" onclick="store_data()"><i class="fas fa-save"></i>{{__('file.Update')}}</button>
                             </div>
                         </div>
                     </form>
@@ -182,9 +188,6 @@
 <script src="{{asset('js/jquery-ui.js')}}"></script>
 <script src="{{asset('js/bootstrap-datetimepicker.min.js')}}"></script>
 <script>
-function _(x){
-    return document.getElementById(x);
-}
 $("#kt_body").addClass("aside-minimize");
 $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD'});
@@ -223,6 +226,9 @@ $(document).ready(function () {
     });
 
     var count = 1;
+    @if(!$purchase->hasManyProducts->isEmpty())
+    count = "{{ count($purchase->hasManyProducts) + 1 }}";
+    @endif
     $('#product_table').on('click','.add-product',function(){
         count++;
         product_row_add(count);
@@ -393,15 +399,30 @@ function calculateNetTotal()
     $('#grand_total').val(grand_total.toFixed(2));
     $('#due_amount').val(due_amount.toFixed(2));
 }
-function account_list(payment_method)
-{
+@if($purchase->account_id)
+account_list("{{ $purchase->payment_method }}","{{ $purchase->account_id }}");
+@endif
+function account_list(payment_method,account_id='')
+{   
+    if(($('#payment_method option:selected').val() == 2) || ($('#payment_method option:selected').val() == 3))
+    {
+        $('.reference_no').removeClass('d-none');
+    }else{
+        $('.reference_no').addClass('d-none');
+    }
     $.ajax({
         url: "{{route('account.list')}}",
         type: "POST",
         data: { payment_method: payment_method,_token: _token},
         success: function (data) {
-            $('#purchase_store_form #account_id').empty().html(data);
-            $('#purchase_store_form #account_id.selectpicker').selectpicker('refresh');
+            $('#purchase_update_form #account_id').html('');
+            $('#purchase_update_form #account_id').html(data);
+            $('#purchase_update_form #account_id.selectpicker').selectpicker('refresh');
+            if(account_id)
+            {
+                $('#purchase_update_form #account_id').val(account_id);
+                $('#purchase_update_form #account_id.selectpicker').selectpicker('refresh');
+            }
         },
         error: function (xhr, ajaxOption, thrownError) {
             console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
@@ -409,19 +430,19 @@ function account_list(payment_method)
     });
 }
 
-supplier_list();
+supplier_list("{{ $purchase->supplier_id }}");
 function supplier_list(supplier_id = '') {
     $.ajax({
         url: "{{route('supplier.list')}}",
         type: "POST",
         data: { _token: _token},
         success: function(data) {
-            $('#purchase_store_form #supplier_id').empty().html(data);
-            $('#purchase_store_form #supplier_id.selectpicker').selectpicker('refresh');
+            $('#purchase_update_form #supplier_id').empty().html(data);
+            $('#purchase_update_form #supplier_id.selectpicker').selectpicker('refresh');
             if(supplier_id)
             {
-                $('#purchase_store_form #supplier_id').val(supplier_id);
-                $('#purchase_store_form #supplier_id.selectpicker').selectpicker('refresh');
+                $('#purchase_update_form #supplier_id').val(supplier_id);
+                $('#purchase_update_form #supplier_id.selectpicker').selectpicker('refresh');
                 
             }
         },
@@ -454,9 +475,9 @@ function store_data(){
         let error = '{{__('file.Please insert product to order table!')}}'
         notification("error",error)
     }else{
-        let form = document.getElementById('purchase_store_form');
+        let form = document.getElementById('purchase_update_form');
         let formData = new FormData(form);
-        let url = "{{route('purchase.store')}}";
+        let url = "{{route('purchase.update')}}";
         $.ajax({
             url: url,
             type: "POST",
@@ -472,16 +493,16 @@ function store_data(){
                 $('#purchase-save-btn').removeClass('spinner spinner-white spinner-right');
             },
             success: function (data) {
-                $('#purchase_store_form').find('.is-invalid').removeClass('is-invalid');
-                $('#purchase_store_form').find('.error').remove();
+                $('#purchase_update_form').find('.is-invalid').removeClass('is-invalid');
+                $('#purchase_update_form').find('.error').remove();
                 if (data.status == false) {
                     $.each(data.errors, function (key, value) {
                         var key = key.split('.').join('_');
                         console.log(key);
-                        $('#purchase_store_form input#' + key).addClass('is-invalid');
-                        $('#purchase_store_form textarea#' + key).addClass('is-invalid');
-                        $('#purchase_store_form select#' + key).parent().addClass('is-invalid');
-                        $('#purchase_store_form #' + key).parent().append(
+                        $('#purchase_update_form input#' + key).addClass('is-invalid');
+                        $('#purchase_update_form textarea#' + key).addClass('is-invalid');
+                        $('#purchase_update_form select#' + key).parent().addClass('is-invalid');
+                        $('#purchase_update_form #' + key).parent().append(
                             '<small class="error text-danger">' + value + '</small>');
                     });
                 } else {

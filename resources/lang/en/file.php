@@ -1637,6 +1637,10 @@ return [
     'Add New Vehicle' => 'Add New Vehicle',
     'Reference No.' => 'Reference No.',
     'Challan No' => 'Challan No',
+    'Purchase Memo' => 'Purchase Memo',
+    'From' => 'From',
+    'To' => 'To',
+    'Partial' => 'Partial',
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',

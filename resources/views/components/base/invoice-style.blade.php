@@ -215,6 +215,9 @@
         html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend,tbody td  {
             font-size: 12pt !important;
         }
+        .site_title{
+            font-size: 16pt !important;
+        }
         /* .print_body {page-break-after: always;} */
         .m-0 {
             margin: 0 !important;
