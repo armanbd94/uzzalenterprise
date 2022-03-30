@@ -16,33 +16,29 @@ class CreatePurchasesTable extends Migration
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
             $table->string('memo_no')->unique();
+            $table->date('purchase_date')->index('purchase_date');
             $table->unsignedBigInteger('warehouse_id');
             $table->foreign('warehouse_id')->references('id')->on('warehouses');
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
+            
             $table->float('item');
             $table->float('total_qty');
-            $table->double('total_discount');
-            $table->double('total_tax');
-            $table->double('total_labor_cost');
             $table->double('total_cost');
-            $table->double('order_tax_rate')->nullable();
-            $table->double('order_tax')->nullable();
-            $table->double('order_discount')->nullable();
             $table->double('shipping_cost')->nullable();
             $table->double('grand_total');
             $table->double('paid_amount');
-            $table->enum('purchase_status',['1','2','3','4'])->comment="1=Received,2=Partial,3=Pending,4=Ordered";
+            $table->double('due_amount')->nullable();
             $table->enum('payment_status',['1','2','3'])->comment="1=Paid,2=Partial,3=Due";
-            $table->enum('payment_method',['1','2','3'])->comment="1=Cash,2=Cheque,3=Mobile";
-            $table->enum('status',['1','2','3'])->default(3)->comment="1=Approved,2=Canceled,3=Pending";
-            $table->string('status_change_by')->nullable();
-            $table->dateTime('status_change_date')->nullable();
+            $table->enum('payment_method',['1','2','3'])->nullable()->comment="1=Cash,2=Bank,3=Mobile";
+            $table->unsignedBigInteger('account_id')->nullable();
+            $table->foreign('account_id')->references('id')->on('chart_of_accounts');
             $table->string('document')->nullable();
             $table->text('note')->nullable();
-            $table->date('purchase_date');
-            $table->string('created_by')->nullable();
-            $table->string('modified_by')->nullable();
+            $table->unsignedBigInteger('creator_id');
+            $table->foreign('creator_id')->references('id')->on('users');
+            $table->unsignedBigInteger('modifier_id')->nullable();
+            $table->foreign('modifier_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

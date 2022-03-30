@@ -136,4 +136,17 @@ class VehicleController extends BaseController
             return response()->json($this->unauthorized());
         }
     }
+
+    public function vehicle_search(Request $request)
+    {
+    	if($request->ajax())
+        {
+            $search = $request->search;
+            $result = [];
+            if($search) {
+                $result = $this->model->where('status',1)->where('name','like','%'.$request->search.'%')->get();
+            }
+            return json_encode($result);
+        }
+    }
 }

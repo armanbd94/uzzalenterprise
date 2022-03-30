@@ -23,6 +23,7 @@ Route::group(['middleware' => ['auth','language']], function () {
         Route::post('delete', 'SupplierController@delete')->name('delete');
         Route::post('bulk-delete', 'SupplierController@bulk_delete')->name('bulk.delete');
         Route::post('change-status', 'SupplierController@change_status')->name('change.status');
+        Route::post('list', 'SupplierController@supplier_list')->name('list');
     });
 
     Route::get('supplier-advance', 'SupplierAdvanceController@index')->name('supplier.advance');

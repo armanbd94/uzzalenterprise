@@ -293,4 +293,21 @@ class SupplierController extends BaseController
         }
     }
 
+    public function supplier_list(Request $request)
+    {
+        if($request->ajax()){
+            $customers = DB::table('suppliers')
+                    ->select('id','name','mobile')
+                    ->get();
+            $output = '<option value="">Select Please</option>';
+            if(!$customers->isEmpty())
+            {
+                foreach ($customers as $key => $value) {
+                    $output .= '<option value="'.$value->id.'">'.$value->name.' - '.$value->mobile.'</option>';
+                }
+            }
+            return $output;
+        }
+    }
+
 }

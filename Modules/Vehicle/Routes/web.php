@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth','language']], function () {
          Route::post('delete', 'VehicleController@delete')->name('delete');
          Route::post('bulk-delete', 'VehicleController@bulk_delete')->name('bulk.delete');
          Route::post('change-status', 'VehicleController@change_status')->name('change.status');
+         Route::post('search', 'VehicleController@vehicle_search')->name('search');
      });
 
 });

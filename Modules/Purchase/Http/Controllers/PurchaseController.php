@@ -3,33 +3,23 @@
 namespace Modules\Purchase\Http\Controllers;
 
 use Exception;
-use App\Models\Tax;
-use App\Models\Unit;
 use App\Models\User;
 use App\Traits\UploadAble;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Modules\Material\Entities\Material;
 use Modules\Purchase\Entities\Purchase;
-use Modules\Setting\Entities\LaborBill;
 use Modules\Setting\Entities\Warehouse;
 use Modules\Supplier\Entities\Supplier;
 use App\Http\Controllers\BaseController;
-use App\Notifications\MaterialPurchased;
 use Modules\Account\Entities\Transaction;
-use Illuminate\Support\Facades\Notification;
-use Modules\Purchase\Entities\PurchasePayment;
-use Modules\Material\Entities\WarehouseMaterial;
 use Modules\Purchase\Http\Requests\PurchaseFormRequest;
-use Illuminate\Support\Facades\Session;
-use Modules\Purchase\Entities\PurchaseMaterial;
+use Illuminate\Support\Facades\App;
+use Modules\Product\Entities\Product;
 
 class PurchaseController extends BaseController
 {
 
     use UploadAble;
-    private const MEMO_NO = 1001;
     public function __construct(Purchase $model)
     {
         $this->model = $model;
@@ -40,7 +30,7 @@ class PurchaseController extends BaseController
         if(permission('purchase-access')){
             $setTitle = __('file.Purchase Manage');
             $this->setPageData($setTitle,$setTitle,'fas fa-shopping-cart',[['name' => $setTitle]]);
-            $suppliers  = Supplier::activeMaterialSuppliers();
+            $suppliers  = Supplier::allSuppliers();
             $warehouses = Warehouse::activeWarehouses();
             return view('purchase::index',compact('suppliers','warehouses'));
         }else{
@@ -68,9 +58,6 @@ class PurchaseController extends BaseController
                 if (!empty($request->supplier_id)) {
                     $this->model->setSupplierID($request->supplier_id);
                 }
-                if (!empty($request->purchase_status)) {
-                    $this->model->setPurchaseStatus($request->purchase_status);
-                }
                 if (!empty($request->payment_status)) {
                     $this->model->setPaymentStatus($request->payment_status);
                 }
@@ -89,20 +76,6 @@ class PurchaseController extends BaseController
                     if(permission('purchase-view')){
                         $action .= ' <a class="dropdown-item view_data" href="'.route("purchase.view",$value->id).'">'.$this->actionButton('View').'</a>';
                     }
-                    if(permission('purchase-approve')){
-                        if($value->status != 1){
-                            $action .= ' <a class="dropdown-item change_status"  data-id="' . $value->id . '" data-name="' . $value->memo_no . '" data-status="'.$value->status.'">'.$this->actionButton('Change Status').'</a>';
-                        }
-                    }
-                    if(permission('purchase-payment-add')){
-                        if($value->payment_status != 1){
-                        $action .= ' <a class="dropdown-item add_payment" data-id="'.$value->id.'" data-due="'.($value->grand_total - $value->paid_amount).'">'.$this->actionButton('Add Payment').'</a>';
-                        }
-                    }
-                    if(permission('purchase-payment-view')){
-                        $action .= ' <a class="dropdown-item view_payment_list"  data-id="'.$value->id.'">'.$this->actionButton('Payment List').'</a>';
-                    }
-
                     if(permission('purchase-delete')){
                         $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->memo_no . '">'.$this->actionButton('Delete').'</a>';
                     }
@@ -111,24 +84,19 @@ class PurchaseController extends BaseController
                     if(permission('purchase-bulk-delete')){
                         $row[] = row_checkbox($value->id);//custom helper function to show the table each row checkbox
                     }
-                    $row[] = $no;
+                    $row[] = translate($no,App::getLocale());
+                    $row[] = translate(date('d-m-Y',strtotime($value->purchase_date)),App::getLocale());
                     $row[] = $value->memo_no;
-                    $row[] = $value->warehouse->name;
-                    $row[] = $value->supplier->company_name.' ( '.$value->supplier->name.')';
-                    $row[] = $value->item;
-                    $row[] = number_format($value->total_cost,2);
-                    // $row[] = $value->order_discount ? number_format($value->order_discount,2) : 0;
-                    $row[] = $value->purchase_material->net_unit_cost ? number_format($value->purchase_material->net_unit_cost,2) : 0;
-                    // $row[] = $value->order_tax_rate ? number_format($value->order_tax_rate,2) : 0;
-                    // $row[] = $value->order_tax ? number_format($value->order_tax,2) : 0;
-                    $row[] = $value->shipping_cost ? number_format($value->shipping_cost,2) : 0;
-                    $row[] = number_format($value->grand_total,2);
-                    $row[] = number_format($value->paid_amount,2);
-                    $row[] = number_format(($value->grand_total - $value->paid_amount),2);
-                    $row[] = date(config('settings.date_format'),strtotime($value->purchase_date));
-                    $row[] = APPROVE_STATUS_LABEL[$value->status];
-                    $row[] = PURCHASE_STATUS_LABEL[$value->purchase_status];
+                    $row[] = $value->warehouse_name;
+                    $row[] = $value->supplier_name;
+                    $row[] = translate($value->item,App::getLocale()).' ('.translate($value->total_qty,App::getLocale()).')';
+                    $row[] = translate(number_format($value->total_cost,2),App::getLocale());
+                    $row[] = translate(($value->shipping_cost ? number_format($value->shipping_cost,2) : 0),App::getLocale());
+                    $row[] = translate(number_format($value->grand_total,2),App::getLocale());
+                    $row[] = translate(number_format($value->paid_amount,2),App::getLocale());
+                    $row[] = translate(number_format($value->due_amount,2),App::getLocale());
                     $row[] = PAYMENT_STATUS_LABEL[$value->payment_status];
+                    $row[] = $value->account_name;
                     $row[] = action_button($action);//custom helper function for action button
                     $data[] = $row;
                 }
@@ -145,13 +113,10 @@ class PurchaseController extends BaseController
         if(permission('purchase-add')){
             $setTitle = __('file.Add Purchase');
             $this->setPageData($setTitle,$setTitle,'fas fa-shopping-cart',[['name' => $setTitle]]);
-            $purchase = $this->model->select('memo_no')->orderBy('memo_no','desc')->first();
             $data = [
                 'warehouses' => Warehouse::activeWarehouses(),
-                'suppliers'  => Supplier::activeMaterialSuppliers(),
-                'taxes'      => Tax::activeTaxes(),
-                'labor_bills' => LaborBill::select('id','name')->where('status',1)->pluck('name','id'),
-                'purchase_data' => Session::get('purchase_data')
+                'products'      => Product::where('status',1)->get(),
+                'memo_no' => 'PP-'.date('ymdHi').rand(1,99)
             ];
             return view('purchase::create',$data);
         }else{
@@ -167,117 +132,31 @@ class PurchaseController extends BaseController
                 // dd($request->all());
                 DB::beginTransaction();
                 try {
-                    $purchase_data = [
-                        'memo_no'          => $request->memo_no,
-                        'supplier_id'      => $request->supplier_id,
-                        'warehouse_id'     => $request->warehouse_id,
-                        'item'             => $request->item,
-                        'total_qty'        => $request->total_qty,
-                        'total_discount'   => $request->total_discount,
-                        'total_tax'        => $request->total_tax,
-                        'total_labor_cost' => 0,
-                        'total_cost'       => $request->total_cost,
-                        'order_tax_rate'   => $request->order_tax_rate,
-                        'order_tax'        => $request->order_tax,
-                        'order_discount'   => $request->order_discount ? $request->order_discount : null,
-                        'shipping_cost'    => $request->shipping_cost ? $request->shipping_cost : null,
-                        'grand_total'      => $request->grand_total,
-                        'paid_amount'      => $request->paid_amount,
-                        'purchase_status'  => $request->purchase_status,
-                        'payment_status'   => $request->payment_status,
-                        'note'             => $request->note,
-                        'purchase_date'    => $request->purchase_date,
-                        'created_by'       => auth()->user()->name
-                    ];
+                    $purchase = $this->model->create($this->model->purchase_data($request->all())); //store purchase data
 
-
-
-                    $payment_data = [
-                        'payment_method' => $request->payment_method,
-                        'account_id'     => $request->account_id,
-                        'paid_amount'    => $request->paid_amount,
-                        'cheque_no'      => $request->cheque_number ? $request->cheque_number : '',
-                    ];
-
-                    if($request->hasFile('document')){
-                        $purchase_data['document'] = $this->upload_file($request->file('document'),PURCHASE_DOCUMENT_PATH);
-                    }
-
-                    //purchase materials
-                    $materials = [];
-                    if($request->has('materials'))
+                    //purchase products
+                    $products = [];
+                    if($request->has('products'))
                     {
-                        foreach ($request->materials as $key => $value) {
-                            $unit = Unit::where('unit_name',$value['unit'])->first();
-                            if($unit->operator == '*'){
-                                $qty = $value['received'] * $unit->operation_value;
-                            }else{
-                                $qty = $value['received'] / $unit->operation_value;
-                            }
-
-
-                            $materials[$value['id']] = [
-                                'qty'              => $value['qty'],
-                                'received'         => $value['received'],
-                                'purchase_unit_id' => $unit ? $unit->id : null,
-                                'net_unit_cost'    => $value['net_unit_cost'],
-                                'discount'         => $value['discount'],
-                                'tax_rate'         => $value['tax_rate'],
-                                'tax'              => $value['tax'],
-                                'total'            => $value['subtotal']
-                            ];
-
+                        foreach ($request->products as $key => $value) {
+                            $products[$value['id']] = $this->model->purchase_products_data($request->warehouse_id,$value);
                         }
                     }
-
-                    // $labor_bills = [];
-                    // if($request->has('bills'))
-                    // {
-                    //     foreach ($request->bills as $key => $value) {
-                    //         $labor_bills[$value['bill_rate_id']] = [
-                    //             'labor_bill_id'   => $value['bill_id'],
-                    //             'qty'   => $value['qty'],
-                    //             'rate'   => $value['rate'],
-                    //             'total' => $value['subtotal']
-                    //         ];
-                    //     }
-                    // }
-
-                    $result  = $this->model->create($purchase_data);
-                    if(empty($result))
-                    {
-                        if($request->hasFile('document')){
-                            $this->delete_file($purchase_data['document'], PURCHASE_DOCUMENT_PATH);
-                        }
+                    if(count($products) > 0){
+                        $purchase->purchase_products()->sync($products);
                     }
-                    $purchase = $this->model->with('purchase_materials')->find($result->id);
-                    if(count($materials) > 0){
-                        $purchase->purchase_materials()->sync($materials);
-                    }
-                    // if(count($labor_bills) > 0){
-                    //     $purchase->labor_bill_rates()->sync($labor_bills);
-                    // }
 
                     $supplier = Supplier::with('coa')->find($request->supplier_id);
-                    $this->purchase_balance_add($result->memo_no,$result->id,$request->grand_total,$supplier->coa->id,$supplier->name,$request->purchase_date,$payment_data);
-
-                    if($purchase)
+                    $transaction = $this->model->purchase_balance_add($supplier->coa->id,$request);//store purchse transaction data
+                    if($transaction == false)
                     {
-                        $users = User::where('role_id',2)->get();
-                        Notification::send($users, new MaterialPurchased($purchase));
-
+                        DB::rollback();
                     }
-
-                    $output  = $this->store_message($result, $request->update_id);
-                    if($result){
-                        Session::forget('purchase_data');
-                    }
+                    $output  = $this->store_message($purchase, $request->purchase_id);
                     DB::commit();
-                    // return response()->json($output);
                 } catch (Exception $e) {
                     DB::rollback();
                     $output = ['status' => 'error','message' => $e->getMessage()];
-                    // return response()->json($output);
                 }
             }else{
                 $output       = $this->unauthorized();
@@ -289,134 +168,13 @@ class PurchaseController extends BaseController
     }
 
 
-    private function purchase_balance_add(string $purchase_no,string $purchase_id,$balance, int $supplier_coa_id, string $supplier_name, $purchase_date, array $payment_data) {
-        if(!empty($purchase_no) && !empty($purchase_id) && !empty($balance) && !empty($supplier_coa_id) && !empty($supplier_name)  && !empty($purchase_date)){
-            // supplier Credit
-            $purchase_coa_transaction = array(
-                'chart_of_account_id' => $supplier_coa_id,
-                'voucher_no'          => $purchase_no,
-                'voucher_type'        => 'Purchase',
-                'voucher_date'        => $purchase_date,
-                'description'         => 'Supplier '.$supplier_name,
-                'debit'               => 0,
-                'credit'              => $balance,
-                'posted'              => 1,
-                'approve'             => 2,
-                'created_by'          => auth()->user()->name,
-                'created_at'          => date('Y-m-d H:i:s')
-            );
-
-            //Inventory Debit
-            $cosde = array(
-                'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('inventory'))->value('id'),
-                'voucher_no'          => $purchase_no,
-                'voucher_type'        => 'Purchase',
-                'voucher_date'        => $purchase_date,
-                'description'         => 'Inventory Debit For Supplier '.$supplier_name,
-                'debit'               => $balance,
-                'credit'              => 0,
-                'posted'              => 1,
-                'approve'             => 2,
-                'created_by'          => auth()->user()->name,
-                'created_at'          => date('Y-m-d H:i:s')
-            );
-
-             // Expense for company
-            $expense = array(
-                'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('material_purchase'))->value('id'),
-                'voucher_no'          => $purchase_no,
-                'voucher_type'        => 'Purchase',
-                'voucher_date'        => $purchase_date,
-                'description'         => 'Company Credit For Supplier '.$supplier_name,
-                'debit'               => $balance,
-                'credit'              => 0,
-                'posted'              => 1,
-                'approve'             => 2,
-                'created_by'          => auth()->user()->name,
-                'created_at'          => date('Y-m-d H:i:s')
-            );
-
-            Transaction::insert([
-                $purchase_coa_transaction,$cosde,$expense
-            ]);
-
-
-            if($payment_data['paid_amount'])
-            {
-                /****************/
-                $supplierdebit = array(
-                    'chart_of_account_id' => $supplier_coa_id,
-                    'voucher_no'          => $purchase_no,
-                    'voucher_type'        => 'Purchase',
-                    'voucher_date'        => $purchase_date,
-                    'description'         => 'Supplier .' . $supplier_name,
-                    'debit'               => $payment_data['paid_amount'],
-                    'credit'              => 0,
-                    'posted'              => 1,
-                    'approve'             => 2,
-                    'created_by'          => auth()->user()->name,
-                    'created_at'          => date('Y-m-d H:i:s')
-                );
-                if($payment_data['payment_method'] == 1){
-                    //Cah In Hand For Supplier
-                    $payment = array(
-                        'chart_of_account_id' => $payment_data['account_id'],
-                        'voucher_no'          => $purchase_no,
-                        'voucher_type'        => 'Purchase',
-                        'voucher_date'        => $purchase_date,
-                        'description'         => 'Cash in Hand For Supplier ' . $supplier_name,
-                        'debit'               => 0,
-                        'credit'              => $payment_data['paid_amount'],
-                        'posted'              => 1,
-                        'approve'             => 2,
-                        'created_by'          => auth()->user()->name,
-                        'created_at'          => date('Y-m-d H:i:s')
-
-                    );
-                }else{
-                    // Bank Ledger
-                    $payment = array(
-                        'chart_of_account_id' => $payment_data['account_id'],
-                        'voucher_no'          => $purchase_no,
-                        'voucher_type'        => 'Purchase',
-                        'voucher_date'        => $purchase_date,
-                        'description'         => 'Paid amount for Supplier  ' . $supplier_name,
-                        'debit'               => 0,
-                        'credit'              => $payment_data['paid_amount'],
-                        'posted'              => 1,
-                        'approve'             => 2,
-                        'created_by'          => auth()->user()->name,
-                        'created_at'          => date('Y-m-d H:i:s')
-                    );
-                }
-
-                $supplier_debit_transaction = Transaction::create($supplierdebit);
-                $payment_transaction        = Transaction::create($payment);
-
-                if($supplier_debit_transaction && $payment_transaction){
-                    PurchasePayment::create([
-                        'purchase_id'                   => $purchase_id,
-                        'account_id'                    => $payment_data['account_id'],
-                        'transaction_id'                => $payment_transaction->id,
-                        'supplier_debit_transaction_id' => $supplier_debit_transaction->id,
-                        'amount'                        => $payment_data['paid_amount'],
-                        'payment_method'                => $payment_data['payment_method'],
-                        'cheque_no'                     => $payment_data['cheque_no'],
-                        'created_by'                    => auth()->user()->name
-                    ]);
-                }
-            }
-        }
-    }
-
-
     public function show(int $id)
     {
         if(permission('purchase-view')){
             $setTitle = __('file.Purchase');
             $setSubTitle = __('file.Purchase Details');
             $this->setPageData($setSubTitle,$setSubTitle,'fas fa-file',[['name'=>$setTitle,'link' => route('purchase')],['name' => $setSubTitle]]);
-            $purchase = $this->model->with('purchase_materials','supplier')->find($id);
+            $purchase = $this->model->with('hasManyProducts','supplier','warehouse','creator')->find($id);
             return view('purchase::details',compact('purchase'));
         }else{
             return $this->access_blocked();
@@ -430,14 +188,10 @@ class PurchaseController extends BaseController
             $setSubTitle = __('file.Edit Purchase');
             $this->setPageData($setSubTitle,$setSubTitle,'fas fa-edit',[['name'=>$setTitle,'link' => route('purchase')],['name' => $setSubTitle]]);
             $data = [
-                'purchase'   => $this->model->with('purchase_materials','labor_bill_rates')->find($id),
+                'purchase'   => $this->model->with('hasManyProducts')->find($id),
                 'warehouses' => Warehouse::activeWarehouses(),
-                'suppliers'  => Supplier::activeMaterialSuppliers(),
-                'taxes'      => Tax::activeTaxes(),
-                'labor_bills' => LaborBill::select('id','name')->where('status',1)->pluck('name','id'),
+                'products'      => Product::where('status',1)->get(),
             ];
-
-            // dd($data['purchase']);
             return view('purchase::edit',$data);
         }else{
             return $this->access_blocked();

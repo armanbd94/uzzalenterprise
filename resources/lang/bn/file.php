@@ -1120,7 +1120,7 @@ return [
     'SL'                                    => 'নং',
     'Total Item'                            => 'মোট আইটেম',
     'Total Amount'                          => 'সর্বমোট পরিমাণ',
-    'Grand Total'                           => 'গ্রেন্ড সর্বমোট',
+    'Grand Total'                           => 'সর্বমোট',
     'Previous Due'                          => 'আগের বকেয়া',
     'Net Total'                             => 'নেট সর্বমোট',
     'Sub Total'                             => 'উপ মোট',
@@ -1623,6 +1623,7 @@ return [
     'Add New Session' => 'নতুন সেশন তৈরি করুন',
     'Add New Vehicle' => 'নতুন গাড়ি তৈরি করুন',
     'Reference No.'  => 'রেফারেন্স নং',
+    'Challan No'  => 'চালান নং', 
 
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',

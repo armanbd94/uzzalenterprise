@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePurchaseMaterialsTable extends Migration
+class CreatePurchaseProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,19 @@ class CreatePurchaseMaterialsTable extends Migration
      */
     public function up()
     {
-        Schema::create('purchase_materials', function (Blueprint $table) {
+        Schema::create('purchase_products', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('purchase_id');
             $table->foreign('purchase_id')->references('id')->on('purchases');
-            $table->unsignedBigInteger('material_id');
-            $table->foreign('material_id')->references('id')->on('materials');
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products');
+            $table->string('vehicle_no',100)->nullable()->index('vehicle_no');
+            $table->string('challan_no',100)->nullable();
             $table->double('qty');
-            $table->double('received');
-            $table->unsignedBigInteger('purchase_unit_id')->nullable();
-            $table->foreign('purchase_unit_id')->references('id')->on('units');
             $table->double('net_unit_cost');
-            $table->double('discount');
-            $table->double('tax_rate');
-            $table->double('tax');
+            $table->double('new_unit_cost')->nullable();
+            $table->double('current_unit_cost')->nullable();
+            $table->double('old_unit_cost')->nullable();
             $table->double('total');
             $table->timestamps();
         });
@@ -39,6 +38,6 @@ class CreatePurchaseMaterialsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchase_materials');
+        Schema::dropIfExists('purchase_products');
     }
 }

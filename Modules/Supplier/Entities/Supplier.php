@@ -143,7 +143,7 @@ class Supplier extends BaseModel
 
     public static function allSuppliers(){
         return Cache::rememberForever(self::ALL_SUPPLIERS, function () {
-            return self::toBase()->active()->orderBy('name','asc')->get();
+            return self::active()->orderBy('name','asc')->get();
         });
     }
 
