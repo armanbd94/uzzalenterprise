@@ -5,6 +5,7 @@ namespace Modules\Sale\Entities;
 use App\Models\User;
 use App\Models\BaseModel;
 use Illuminate\Support\Facades\DB;
+use Modules\Account\Entities\ChartOfAccount;
 use Modules\Product\Entities\Product;
 use Modules\Sale\Entities\SaleProduct;
 use Modules\Customer\Entities\Customer;
@@ -26,6 +27,10 @@ class Sale extends BaseModel
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+    public function account()
+    {
+        return $this->belongsTo(ChartOfAccount::class,'account_id','id')->withDefault(['name'=>'']);
     }
 
     public function  sale_products()

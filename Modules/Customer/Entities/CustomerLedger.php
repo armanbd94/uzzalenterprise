@@ -54,7 +54,7 @@ class CustomerLedger extends BaseModel
         $query = self::select('transactions.*','coa.id as coa_id','coa.code','coa.name','coa.parent_name','c.id as customer_id','c.company_name','c.name','c.mobile')
         ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('customers as c','coa.customer_id','c.id')
-        ->where(['transactions.approve'=>1]);
+        ->where(['transactions.approve'=>1])->orderBy('transactions.voucher_date','asc');
 
         //search query
         if (!empty($this->_customer_id)) {

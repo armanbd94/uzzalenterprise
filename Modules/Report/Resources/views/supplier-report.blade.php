@@ -40,7 +40,15 @@
                             </div>
                         </div>
 
-                        <div class="col-md-8">
+                        <x-form.selectbox labelName="supplier" name="supplier_id" col="col-md-4" class="selectpicker">
+                            @if (!$suppliers->isEmpty())
+                                @foreach ($suppliers as $value)
+                                    <option value="{{ $value->id }}">{{ $value->name.' - '.$value->mobile }}</option>
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
+
+                        <div class="col-md-4">
                             <div style="margin-top:28px;">     
                                     <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right custom-btn" type="button"
                                     data-toggle="tooltip" data-theme="dark" title="Reset">
@@ -60,6 +68,13 @@
                     <div class="col-md-12 px-0" style="position: relative;">
                         <div id="invoice" style="width: 100%;">
                             <x-base.invoice-style />
+                            <style>
+                                .invoice ul{
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                    list-style: none;
+                                }
+                            </style>
                             <div class="invoice overflow-auto" id="report_data">
                             
                             </div>
@@ -110,35 +125,39 @@ $(document).ready(function () {
     $('#btn-reset').click(function () {
         $('input[name="start_date"]').val("{{ config('settings.session_start') }}");
         $('input[name="end_date"]').val("{{ config('settings.session_end') }}");
+        $('#supplier_id').val('');
+        $('#supplier_id.selectpicker').selectpicker('refresh');
         $('#report_data').empty();
-        report_data();
     });
 });
-report_data();
+
 function report_data()
 {
     let start_date = document.getElementById('start_date').value;
     let end_date   = document.getElementById('end_date').value;
+    let supplier_id = document.getElementById('supplier_id').value;
     if (start_date && end_date) {
-
-        $.ajax({
-            url:"{{ route('product.report.data') }}",
-            type:"POST",
-            data:{start_date:start_date,end_date:end_date,_token:_token},
-            beforeSend: function(){
-                $('#table-loader').removeClass('d-none');
-            },
-            complete: function(){
-                $('#table-loader').addClass('d-none');
-            },
-            success:function(data){
-                $('#report_data').empty().html(data);
-            },
-            error: function (xhr, ajaxOption, thrownError) {
-                console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
-            }
-        });
-  
+        if(supplier_id){
+            $.ajax({
+                url:"{{ route('supplier.report.data') }}",
+                type:"POST",
+                data:{start_date:start_date,end_date:end_date,supplier_id:supplier_id,_token:_token},
+                beforeSend: function(){
+                    $('#table-loader').removeClass('d-none');
+                },
+                complete: function(){
+                    $('#table-loader').addClass('d-none');
+                },
+                success:function(data){
+                    $('#report_data').empty().html(data);
+                },
+                error: function (xhr, ajaxOption, thrownError) {
+                    console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+                }
+            });
+        }else{
+            notification('error','Please select supplier!');
+        }
     } else {
         notification('error','Please choose date!');
     }

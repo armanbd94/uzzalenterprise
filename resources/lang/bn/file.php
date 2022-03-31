@@ -1630,6 +1630,13 @@ return [
     'Partial' => 'আংশিক',
     'Total Price' => 'মোট খরচ',
     'Sale Invoice' => 'বিক্রয় চালান',
+    'Purchased Amount' => 'ক্রয় মূল্য',
+    'Purchased Qty' => 'ক্রয়ের পরিমাণ',
+    'Sold Amount' => 'বিক্রিত মূল্য',
+    'Sold Qty' => 'বিক্রির পরিমাণ',
+    'Profit Amount' => 'লাভ',
+    'Current Stock' => 'বর্তমান স্টক',
+    'to' => 'থেকে',
 
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',

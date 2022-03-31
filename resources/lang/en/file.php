@@ -1643,6 +1643,13 @@ return [
     'Partial' => 'Partial',
     'Total Price' => 'Total Price',
     'Sale Invoice' => 'Sale Invoice',
+    'Purchased Amount' => 'Purchased Amount',
+    'Purchased Qty' => 'Purchased Qty',
+    'Sold Amount' => 'Sold Amount',
+    'Sold Qty' => 'Sold Qty',
+    'Profit Amount' => 'Profit Amount',
+    'Current Stock' => 'Current Stock',
+    'to' => 'to',
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',
