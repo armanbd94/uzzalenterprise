@@ -37,4 +37,5 @@ Route::group(['middleware' => ['auth','language']], function () {
                                   
      //Summary Report
      Route::get('summary-report', 'SummaryReportController@index')->name('summary.report');
+     Route::post('summary-report/data', 'SummaryReportController@report_data')->name('summary.report.data');
 });

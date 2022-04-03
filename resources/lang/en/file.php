@@ -1650,6 +1650,14 @@ return [
     'Profit Amount' => 'Profit Amount',
     'Current Stock' => 'Current Stock',
     'to' => 'to',
+    'Total Supplier' => 'Total Supplier',
+    'Total Customer' => 'Total Customer',
+    'Total Purchase Qty' => 'Total Purchase Qty',
+    'Total Sale Qty' => 'Total Sale Qty',
+    'Total Supplier Due' => 'Total Supplier Due',
+    'Total Customer Due' => 'Total Customer Due',
+    'Total Sale' => 'Total Sale',
+
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',

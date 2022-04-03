@@ -1601,7 +1601,7 @@ return [
     'Rice Name'                             => 'চাউলের নাম',
     'kg'                                    => 'কেজি',
     'Parboiling Time'                       => 'পারবোইলিং সময়',
-    'Total Purchase'                        => 'মোট ক্রয়ের পরিমান',
+    'Total Purchase'                        => 'মোট ক্রয়',
     'Total Scale Amount'                    => 'মোট স্কেলের পরিমান ',
     'Paddy Manager Sign'                    => 'পেডি ম্যানেজারের স্বাক্ষর',
     'Parboiling Technician Sign'            => 'পারবোইলিং টেকনিশানের স্বাক্ষর',
@@ -1637,7 +1637,13 @@ return [
     'Profit Amount' => 'লাভ',
     'Current Stock' => 'বর্তমান স্টক',
     'to' => 'থেকে',
-
+    'Total Supplier' => 'মোট সাপ্লাইয়ার',
+    'Total Customer' => 'মোট কাস্টমার',
+    'Total Purchase Qty' => 'মোট ক্রয়ের পরিমাণ',
+    'Total Sale Qty' => 'মোট বিক্রয়ের পরিমাণ',
+    'Total Supplier Due' => 'মোট সাপ্লাইয়ার বকেয়া',
+    'Total Customer Due' => 'মোট কাস্টমার বকেয়া',
+    'Total Sale' => 'মোট বিক্রয়',
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                              => 'ব্যাপারীর মালামাল উৎপাদন,ডেলিভারী,মিল ভাড়ার রিপোর্ট ',
