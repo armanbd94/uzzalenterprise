@@ -32,13 +32,17 @@
                                     <label for="voucher_date">{{__('file.Date')}}</label>
                                     <input type="text" class="form-control date" name="voucher_date" id="voucher_date" value="{{ date('Y-m-d') }}" readonly />
                                 </div>
-                                <x-form.selectbox labelName="{{__('file.Supplier')}}" name="supplier_id" required="required"  col="col-md-6" class="selectpicker">
+                                <x-form.selectbox labelName="{{__('file.Supplier')}}" name="supplier_id"  onchange="dueAmount(this.value)" required="required"  col="col-md-6" class="selectpicker">
                                     @if (!$suppliers->isEmpty())
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}">{{ $supplier->name.' - '.$supplier->mobile }}</option>
                                     @endforeach
                                     @endif
                                 </x-form.selectbox>
+                                <div class="form-group col-md-6">
+                                    <label for="due_amount">{{ __('file.Due Amount') }}</label>
+                                    <input type="text" class="form-control"  id="due_amount" readonly />
+                                </div>
                                 <x-form.selectbox labelName="{{__('file.Payment Type')}}" name="payment_type" required="required"  col="col-md-6" class="selectpicker">
                                     @foreach (PAYMENT_METHOD as $key => $value)
                                     <option value="{{ $key }}">{{ $value }}</option>
@@ -83,6 +87,20 @@ $(document).on('change', '#payment_type', function () {
         }
     });
 });
+function dueAmount(supplier_id)
+{
+    $.ajax({
+        url: "{{url('supplier/due-amount')}}/"+supplier_id,
+        type: "GET",
+        dataType: "JSON",
+        success: function (data) {
+            data ? $('#due_amount').val(parseFloat(data).toFixed(2)) : $('#due_amount').val('0.00');
+        },
+        error: function (xhr, ajaxOption, thrownError) {
+            console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+        }
+    });
+}
 function store_data(){
     let form = document.getElementById('supplier-payment-form');
     let formData = new FormData(form);

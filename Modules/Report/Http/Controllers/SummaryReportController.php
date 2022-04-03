@@ -105,7 +105,7 @@ class SummaryReportController extends BaseController
                             <tr>
                                 <td style='text-align:center;'><b>".translate((4),App::getLocale())."</b></td>
                                 <td style='text-align:left;'><b>".__('file.Total Supplier Due')."</b></td>
-                                <td style='text-align:right;'><b>".translate(number_format(($supplier_transaction->due ? str_replace('-','',$supplier_transaction->due) : 0),2,'.',','),App::getLocale())."</b></td>
+                                <td style='text-align:right;'><b>".translate(number_format(($supplier_transaction->due ?$supplier_transaction->due : 0),2,'.',','),App::getLocale())."</b></td>
                             </tr>
                         </tbody>
                     </table>
@@ -135,7 +135,7 @@ class SummaryReportController extends BaseController
                             <tr>
                                 <td style='text-align:center;'><b>".translate((4),App::getLocale())."</b></td>
                                 <td style='text-align:left;'><b>".__('file.Total Customer Due')."</b></td>
-                                <td style='text-align:right;'><b>".translate(number_format(($customer_transaction->due ? str_replace('-','',$customer_transaction->due) : 0),2,'.',','),App::getLocale())."</b></td>
+                                <td style='text-align:right;'><b>".translate(number_format(($customer_transaction->due ? $customer_transaction->due : 0),2,'.',','),App::getLocale())."</b></td>
                             </tr>
                         </tbody>
                     </table>

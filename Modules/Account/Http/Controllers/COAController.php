@@ -23,7 +23,7 @@ class COAController extends BaseController
             $setTitle = __('file.Chart of Account');
             $this->setPageData($setTitle,$setTitle,'far fa-money-bill-alt',[['name' => $setTitle]]);
             $data = [
-                'accounts'      => $this->model->where('status',1)->orderBy('id','asc')->get(),
+                'coas' => ChartOfAccount::accounts(),
             ];
             return view('account::coa.index',$data);
         }else{

@@ -21,8 +21,8 @@
 @section('content')
 <div class="d-flex flex-column-fluid">
     <div class="container-fluid">
-        {{-- <div class="row">
-            <div class="col-md-2">
+        <div class="row">
+            <div class="col-md-4">
                 <div class="bg-white text-center py-3  rounded-xl">
                     <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
                         <img src="{{asset('images/purchase.svg')}}" alt="purchase" class="icon">
@@ -31,7 +31,7 @@
                     <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Purchase')}}</a>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="bg-white text-center py-3  rounded-xl">
                     <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
                         <img src="{{asset('images/sale.svg')}}" alt="sale" class="icon">
@@ -40,34 +40,8 @@
                     <a href="{{ route('sale') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Sale')}}</a>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="bg-white text-center py-3  rounded-xl">
-                    <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
-                        <img src="{{asset('images/machine.svg')}}" alt="machine purchase" class="icon">
-                    </span>
-                    <h6 id="machine_purchase" class="m-0">{{ number_format($machine_purchase,2) }}{{__('file.TK')}}</h6>
-                    <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Machine Purchase')}}</a>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="bg-white text-center py-3  rounded-xl">
-                    <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
-                        <img src="{{asset('images/maintenance.svg')}}" alt="maintenance service" class="icon">
-                    </span>
-                    <h6 id="maintenance_service" class="m-0">{{ number_format($maintenance_service,2) }}{{__('file.TK')}}</h6>
-                    <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Maintenance Service')}}</a>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="bg-white text-center py-3  rounded-xl">
-                    <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
-                        <img src="{{asset('images/transport.svg')}}" alt="transport service" class="icon">
-                    </span>
-                    <h6 id="transport_service" class="m-0">{{ number_format($transport_service,2) }}{{__('file.TK')}}</h6>
-                    <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Transport Service')}}</a>
-                </div>
-            </div>
-            <div class="col-md-2">
+
+            <div class="col-md-4">
                 <div class="bg-white text-center py-3  rounded-xl">
                     <span class="svg-icon svg-icon-3x svg-icon-danger d-block my-3">
                         <img src="{{asset('images/expense.svg')}}" alt="expense" class="icon">
@@ -76,9 +50,9 @@
                     <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Expense')}}</a>
                 </div>
             </div>
-        </div> --}}
+        </div>
         <!-- Start :: Bar Chart-->
-        {{-- <div class="row py-5">
+        <div class="row py-5">
             <div class="col-md-12">
             <div class="card bar-chart">
                 <div class="card-header d-flex align-items-center">
@@ -91,7 +65,7 @@
                 </div>
             </div>
             </div>
-        </div> --}}
+        </div>
         <!-- End :: Bar Chart-->
     </div>
 </div>
@@ -108,10 +82,7 @@ $(document).ready(function(){
         $.get("{{ url('dashboard-data') }}/"+start_date+'/'+end_date, function(data){
             $('#sale').text((data.sale).toFixed(2)+'Tk');
             $('#purchase').text((data.purchase).toFixed(2)+'Tk');
-            $('#machine_purchase').text((data.machine_purchase).toFixed(2)+'Tk');
             $('#expense').text((data.expense).toFixed(2)+'Tk');
-            $('#maintenance_service').text((data.maintenance_service).toFixed(2)+'Tk');
-            $('#transport_service').text((data.transport_service).toFixed(2)+'Tk');
         });
     });
 

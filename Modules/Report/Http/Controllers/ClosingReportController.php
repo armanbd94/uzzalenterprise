@@ -76,6 +76,7 @@ class ClosingReportController extends BaseController
                     'date'             => date('Y-m-d'),
                     'thousands'        => $request->thousands ? $request->thousands : 0,
                     'five_hundred'     => $request->five_hundred ? $request->five_hundred : 0,
+                    'two_hundred'      => $request->two_hundred ? $request->two_hundred : 0,
                     'hundred'          => $request->hundred ? $request->hundred : 0,
                     'fifty'            => $request->fifty ? $request->fifty : 0,
                     'twenty'           => $request->twenty ? $request->twenty : 0,

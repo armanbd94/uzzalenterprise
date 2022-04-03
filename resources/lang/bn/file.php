@@ -751,7 +751,7 @@ return [
     'Enter zipcode'                         => 'জিপ কোড প্রবেশ',
     'Previous credit balalnce'              => 'পূর্ববর্তী ক্রেডিট ব্যালেন্স',
     'Enter customer address'                => 'কাস্টমার ঠিকানা লিখুন',
-    'Accounts'                              => 'হিসাব',
+    'Accounts'                              => 'অ্যাকাউন্টস',
     'Chart of Account'                      => 'অ্যাকাউন্ট চার্ট',
     "Code"                                  => "কোড",
     "Parent Head"                           => "প্যারেন্ট হেড",

@@ -69,49 +69,54 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td class="1000">{{__('file.1000')}}</td>
+                                                    <td class="1000">1000</td>
                                                     <td><input type="text" class="form-control text_1 text-right" name="thousands" onkeyup="cashCalculator()"  onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_1_bal text-right" readonly=""></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_1_bal text-right" readonly=""></td>
+                                                </tr> 
+                                                <tr>
+                                                    <td class="500">500</td>
+                                                    <td><input type="text" class="form-control text_2 text-right" name="five_hundred" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_2_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="200">200</td>
+                                                    <td><input type="text" class="form-control text_3 text-right" name="two_hundred" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_3_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="100">100</td>
+                                                    <td><input type="text" class="form-control text_4 text-right" name="hundred" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_4_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="50">50</td>
+                                                    <td><input type="text" class="form-control text_5 text-right" name="fifty" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_5_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="20">20</td>
+                                                    <td><input type="text" class="form-control text_6 text-right" name="twenty" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_6_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="10">10</td>
+                                                    <td><input type="text" class="form-control text_7 text-right" name="ten" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_7_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="5">5</td>
+                                                    <td><input type="text" class="form-control text_8 text-right" name="five" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_8_bal text-right" readonly=""></td>
+                                                </tr>   
+                                                <tr>
+                                                    <td class="2">2</td>
+                                                    <td><input type="text" class="form-control text_9 text-right" name="two" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_9_bal text-right" readonly=""></td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="500">{{__('file.500')}}</td>
-                                                    <td><input type="text" class="form-control text_2 text-right" name="fivehnd" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_2_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="100">{{__('file.100')}}</td>
-                                                    <td><input type="text" class="form-control text_3 text-right" name="hundrad" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_3_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="50">{{__('file.50')}}</td>
-                                                    <td><input type="text" class="form-control text_4 text-right" name="fifty" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_4_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="20">{{__('file.20')}}</td>
-                                                    <td><input type="text" class="form-control text_5 text-right" name="twenty" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_5_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="10">{{__('file.10')}}</td>
-                                                    <td><input type="text" class="form-control text_6 text-right" name="ten" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_6_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="5">{{__('file.5')}}</td>
-                                                    <td><input type="text" class="form-control text_7 text-right" name="five" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_7_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="2">{{__('file.2')}}</td>
-                                                    <td><input type="text" class="form-control text_8 text-right" name="two" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_8_bal text-right" readonly=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="1">{{__('file.1')}}</td>
-                                                    <td><input type="text" class="form-control text_9 text-right" name="one" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
-                                                    <td><input type="text" class="form-control text_9_bal text-right" readonly=""></td>
+                                                    <td class="1">1</td>
+                                                    <td><input type="text" class="form-control text_10 text-right" name="one" onkeyup="cashCalculator()" onchange="cashCalculator()"></td>
+                                                    <td><input type="text" class="form-control bg-secondary text_10_bal text-right" readonly=""></td>
                                                 </tr>
                                             </tbody>
                                             <tfoot>
@@ -209,7 +214,6 @@ function store_data(){
 }
 
 function cashCalculator() {
-
     var mul1 = $('.text_1').val();
     var text_1_bal = mul1 * 1000;
     $('.text_1_bal').val(text_1_bal);
@@ -246,9 +250,11 @@ function cashCalculator() {
     var text_9_bal = mul9 * 1;
     $('.text_9_bal').val(text_9_bal);
 
+    var mul10 = $('.text_10').val();
+    var text_10_bal = mul10 * 1;
+    $('.text_10_bal').val(text_10_bal);
 
-    var total_money = (text_1_bal + text_2_bal + text_3_bal + text_4_bal + text_5_bal + text_6_bal + text_7_bal + text_8_bal + text_9_bal);
-
+    var total_money = (text_1_bal + text_2_bal + text_3_bal + text_4_bal + text_5_bal + text_6_bal + text_7_bal + text_8_bal + text_9_bal + text_10_bal);
     $('.total_money').val(total_money);
 }
 </script>

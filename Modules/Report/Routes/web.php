@@ -32,6 +32,10 @@ Route::group(['middleware' => ['auth','language']], function () {
      Route::get('supplier-report', 'SupplierReportController@index')->name('supplier.report');
      Route::post('supplier-report/data', 'SupplierReportController@report_data')->name('supplier.report.data');
                                   
+     Route::get('payment-report', 'PaymentReportController@index')->name('payment.report');
+     Route::post('payment-report/data', 'PaymentReportController@report_data')->name('payment.report.data');
+                                  
+                                  
      Route::get('due-report', 'DueReportController@index')->name('due.report');
      Route::post('due-report/data', 'DueReportController@report_data')->name('due.report.data');
                                   

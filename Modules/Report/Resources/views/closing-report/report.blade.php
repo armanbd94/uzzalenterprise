@@ -24,9 +24,9 @@
                         <div class="form-group col-md-4">
                             <label for="name">{{__('file.Choose Your Date')}}</label>
                             <div class="input-group">
-                                <input type="text" class="form-control daterangepicker-filed" value="{{ date('Y-m-d') }} To {{ date('Y-m-d') }}">
-                                <input type="hidden" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
-                                <input type="hidden" id="end_date" name="end_date" value="{{ date('Y-m-d')}}">
+                                <input type="text" class="form-control daterangepicker-filed" value="{{ config('settings.session_start').' to '.config('settings.session_end') }}">
+                                <input type="hidden" id="start_date" name="start_date" value="{{ config('settings.session_start') }}">
+                                <input type="hidden" id="end_date" name="end_date"  value="{{ config('settings.session_end') }}">
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -254,8 +254,8 @@
 
         $('#btn-reset').click(function () {
             $('#form-filter')[0].reset();
-            $('#form-filter #start_date').val('');
-            $('#form-filter #end_date').val('');
+            $('input[name="start_date"]').val("{{ config('settings.session_start') }}");
+            $('input[name="end_date"]').val("{{ config('settings.session_end') }}");
             table.ajax.reload();
         });
     });

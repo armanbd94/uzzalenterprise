@@ -311,4 +311,15 @@ class SupplierController extends BaseController
         }
     }
 
+    public function due_amount(int $id)
+    {
+        $due_amount = $this->model->supplier_balance($id);
+
+        if($due_amount < 0)
+        {
+            $due_amount = explode('-',$due_amount)[1];
+        }
+        return response()->json($due_amount);
+    }
+
 }

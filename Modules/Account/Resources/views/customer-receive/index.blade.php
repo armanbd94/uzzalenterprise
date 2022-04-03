@@ -31,13 +31,17 @@
                                 <label for="voucher_date">{{__('file.Date')}}</label>
                                 <input type="text" class="form-control date" name="voucher_date" id="voucher_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
-                            <x-form.selectbox labelName="{{__('file.Customer')}}" name="customer_id" required="required"  col="col-md-6" class="selectpicker">
+                            <x-form.selectbox labelName="{{__('file.Customer')}}" name="customer_id" onchange="dueAmount(this.value)" required="required"  col="col-md-6" class="selectpicker">
                                 @if (!$customers->isEmpty())
                                 @foreach ($customers as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->name }}</option>
                                 @endforeach
                                 @endif
                             </x-form.selectbox>
+                            <div class="form-group col-md-6">
+                                <label for="due_amount">{{ __('file.Due Amount') }}</label>
+                                <input type="text" class="form-control"  id="due_amount" readonly />
+                            </div>
                              <x-form.selectbox labelName="{{__('file.Payment Type')}}" name="payment_type" required="required"  col="col-md-6" class="selectpicker">
                                 @foreach (SALE_PAYMENT_METHOD as $key => $value)
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -79,6 +83,20 @@ $(document).on('change', '#payment_type', function () {
         }
     });
 });
+function dueAmount(customer_id)
+{
+    $.ajax({
+        url: "{{url('customer/previous-balance')}}/"+customer_id,
+        type: "GET",
+        dataType: "JSON",
+        success: function (data) {
+            data ? $('#due_amount').val(parseFloat(data).toFixed(2)) : $('#due_amount').val('0.00');
+        },
+        error: function (xhr, ajaxOption, thrownError) {
+            console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+        }
+    });
+}
 function store_data(){
     let form = document.getElementById('customer-receive-form');
     let formData = new FormData(form);
