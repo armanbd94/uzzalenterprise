@@ -69,7 +69,7 @@
                                     <tbody>
                                         <tr>
                                             <td>                                                  
-                                                <select name="products[1][id]" id="products_1_id" onchange="setProductData(1)" class="fcs col-md-12 form-control selectpicker"  data-live-search="true" data-row="1">                                            
+                                                <select name="products[1][id]" id="products_1_id" onchange="setProductData(1)" class="fcs col-md-12 product_data form-control selectpicker"  data-live-search="true" data-row="1">                                            
                                                     @if (!$products->isEmpty())
                                                         <option value="0">Please Select</option>
                                                     @foreach ($products as $product)
@@ -78,17 +78,17 @@
                                                     @endif
                                                 </select> 
                                             </td>                                        
-                                            <td><input type="text" class="form-control vehicle_no text-left" name="products[1][vehicle_no]" id="products_1_vehicle_no"  data-row="1"></td>
-                                            <td><input type="text" class="form-control text-left" name="products[1][challan_no]" id="products_1_challan_no"  data-row="1"></td>
-                                            <td class="products_1_stock_qty text-center"></td>
-                                            <td><input type="text" class="form-control qty text-center" onkeyup="calculateRowTotal(1)" name="products[1][qty]" id="products_1_qty"  data-row="1"></td>
-                                            <td><input type="text" class="text-right form-control price" onkeyup="calculateRowTotal(1)" name="products[1][price]" id="products_1_price" data-row="1"></td>
-                                            <td class="subtotal_1 text-right" data-row="1"></td>
+                                            <td><input type="text" class="form-control product_data vehicle_no text-left" name="products[1][vehicle_no]" id="products_1_vehicle_no"  data-row="1"></td>
+                                            <td><input type="text" class="form-control product_data text-left" name="products[1][challan_no]" id="products_1_challan_no"  data-row="1"></td>
+                                            <td class="products_1_stock_qty  product_data text-center"></td>
+                                            <td><input type="text" class="form-control qty  product_data text-center" onkeyup="calculateRowTotal(1)" name="products[1][qty]" id="products_1_qty"  data-row="1"></td>
+                                            <td><input type="text" class="text-right form-control  product_data price" onkeyup="calculateRowTotal(1)" name="products[1][price]" id="products_1_price" data-row="1"></td>
+                                            <td class="subtotal_1  product_data text-right" data-row="1"></td>
                                             <td></td>
-                                            <input type="hidden" class="text-right form-control" name="products[1][stock_qty]" id="products_1_stock_qty" data-row="1">
-                                            <input type="hidden" class="text-right form-control net_unit_cost" name="products[1][net_unit_cost]" id="products_1_net_unit_cost" data-row="1">
-                                            <input type="hidden" class="subtotal" id="products_1_subtotal" name="products[1][subtotal]" data-row="1">
-                                            <input type="hidden" class="subtotal_cost" id="products_1_subtotal_cost" name="products[1][subtotal_cost]" data-row="1">
+                                            <input type="hidden" class="text-right  product_data form-control" name="products[1][stock_qty]" id="products_1_stock_qty" data-row="1">
+                                            <input type="hidden" class="text-right  product_data form-control net_unit_cost" name="products[1][net_unit_cost]" id="products_1_net_unit_cost" data-row="1">
+                                            <input type="hidden" class="subtotal  product_data" id="products_1_subtotal" name="products[1][subtotal]" data-row="1">
+                                            <input type="hidden" class="subtotal_cost  product_data" id="products_1_subtotal_cost" name="products[1][subtotal_cost]" data-row="1">
                                        </tr>
                                     </tbody>
                                     <tfoot>
@@ -103,7 +103,7 @@
                                         </tr>
                                         <tr>
                                             <td class="text-right font-weight-bolder" colspan="6">{{ __('file.Shipping Cost') }}</td>
-                                            <td><input type="text" class="fcs form-control text-right" name="shipping_cost" id="shipping_cost" onkeyup="calculateNetTotal()" placeholder="0.00"></td>
+                                            <td><input type="text" class="fcs form-control payment_data text-right" name="shipping_cost" id="shipping_cost" onkeyup="calculateNetTotal()" placeholder="0.00"></td>
                                             <td></td>
                                         </tr>
                                         <tr>
@@ -122,7 +122,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-right font-weight-bolder">{{ __('file.Grand Total') }}</td>
-                                            <td><input type="text" class="fcs form-control text-right bg-secondary" name="grand_total" id="grand_total" placeholder="0.00" readonly></td>
+                                            <td><input type="text" class="fcs form-control payment_data text-right bg-secondary" name="grand_total" id="grand_total" placeholder="0.00" readonly></td>
                                             <td></td>
                                         </tr>
                                         <tr>
@@ -138,14 +138,14 @@
                                             <td class="text-right font-weight-bolder">{{ __('file.Paid Amount') }}</td>
                                             <td>
                                                 <div class="form-group mb-0">
-                                                <input type="text" class="fcs form-control text-right" name="paid_amount" id="paid_amount" onkeyup="calculateNetTotal()" placeholder="0.00">
+                                                <input type="text" class="fcs form-control payment_data text-right" name="paid_amount" id="paid_amount" onkeyup="calculateNetTotal()" placeholder="0.00">
                                                 </div>
                                             </td>
                                             <td></td>
                                         </tr>
                                         <tr>
                                             <td class="text-right font-weight-bolder" colspan="6">{{ __('file.Due Amount') }}</td>
-                                            <td><input type="text" class="fcs form-control bg-secondary text-right" name="due_amount" id="due_amount" placeholder="0.00" readonly></td>
+                                            <td><input type="text" class="fcs form-control payment_data bg-secondary text-right" name="due_amount" id="due_amount" placeholder="0.00" readonly></td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -155,20 +155,20 @@
 
                             <div class="form-group col-md-12">
                                 <label for="note">{{__('file.Note')}}</label>
-                                <textarea  class="form-control" name="note" id="note" cols="30" rows="3"></textarea>
+                                <textarea  class="form-control product_data" name="note" id="note" cols="30" rows="3"></textarea>
                             </div>
 
 
 
                             <div class="col-md-12">
-                                <input type="hidden" name="total_qty" >
-                                <input type="hidden" name="total_cost" id="total_cost" >
-                                <input type="hidden" name="total_price" id="total_price" >
-                                <input type="hidden" name="item" >
+                                <input type="hidden" name="total_qty" class="product_data">
+                                <input type="hidden" name="total_cost" id="total_cost"  class="product_data">
+                                <input type="hidden" name="total_price" id="total_price"  class="product_data">
+                                <input type="hidden" name="item"  class="product_data">
                             </div>
                             <div class="form-grou col-md-12 text-center pt-5">
-                                <button type="button" class="btn btn-danger btn-sm mr-3"><i class="fas fa-sync-alt"></i>{{__('file.Reset')}}</button>
-                                <button type="button" class="btn btn-primary btn-sm mr-3" id="sale-save-btn" onclick="store_data()"><i class="fas fa-save"></i>{{__('file.Save')}}</button>
+                                <button type="button" class="btn btn-primary btn-sm mr-3" id="sale-save-btn1" onclick="store_data(1)"><i class="fas fa-save"></i>{{__('file.Save')}}</button>
+                                <button type="button" class="btn btn-success btn-sm mr-3" id="sale-save-btn2" onclick="store_data(2)"><i class="fas fa-save"></i>{{__('file.Save & Add New')}}</button>
                             </div>
                         </div>
                     </form>
@@ -229,33 +229,7 @@ $(document).ready(function () {
         product_row_add(count);
     }); 
        
-    function product_row_add(count){
-        var html = ` <tr>
-                        <td>                                                  
-                            <select name="products[${count}][id]" id="products_${count}_id" onchange="setProductData(${count})"  class="fcs col-md-12 form-control selectpicker" data-live-search="true" data-row="${count}">                                            
-                                @if (!$products->isEmpty())
-                                    <option value="0">Please Select</option>
-                                @foreach ($products as $product)
-                                    <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-cost="{{ $product->cost ?? 0 }}" data-qty="{{ $product->qty ?? 0 }}">{{ $product->name.' ('.$product->code.')' }}</option>
-                                @endforeach
-                                @endif
-                            </select> 
-                        </td>                                        
-                        <td><input type="text" class="form-control vehicle_no text-left" name="products[${count}][vehicle_no]" id="products_${count}_vehicle_no"  data-row="${count}"></td>
-                        <td><input type="text" class="form-control text-left" name="products[${count}][challan_no]" id="products_${count}_challan_no"  data-row="${count}"></td>
-                        <td class="products_${count}_stock_qty text-center"></td>
-                        <td><input type="text" class="form-control qty text-center" onkeyup="calculateRowTotal(${count})" name="products[${count}][qty]" id="products_${count}_qty"  data-row="${count}"></td>
-                        <td><input type="text" class="text-right form-control price" onkeyup="calculateRowTotal(${count})" name="products[${count}][price]" id="products_${count}_price" data-row="${count}"></td>
-                        <td class="subtotal_${count} text-right" data-row="${count}"></td>
-                        <td><button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button></td>
-                        <input type="hidden" class="text-right form-control" onkeyup="calculateRowTotal(${count})" name="products[${count}][stock_qty]" id="products_${count}_stock_qty" data-row="${count}">
-                        <input type="hidden" class="text-right form-control net_unit_cost" onkeyup="calculateRowTotal(${count})" name="products[${count}][net_unit_cost]" id="products_${count}_net_unit_cost" data-row="${count}">
-                        <input type="hidden" class="subtotal" id="products_${count}_subtotal" name="products[${count}][subtotal]" data-row="${count}">
-                        <input type="hidden" class="subtotal_cost" id="products_${count}_subtotal_cost" name="products[${count}][subtotal_cost]" data-row="${count}">
-                    </tr>`;
-        $('#product_table tbody').append(html);
-        $('#product_table .selectpicker').selectpicker();
-    } 
+    
 
     $("#product_table").on('input', '.vehicle_no', function() {
         var input = $(this);
@@ -337,6 +311,34 @@ $(document).ready(function () {
     });
 
 });
+
+function product_row_add(count){
+    var html = ` <tr>
+                    <td>                                                  
+                        <select name="products[${count}][id]" id="products_${count}_id" onchange="setProductData(${count})"  class="fcs col-md-12 form-control selectpicker" data-live-search="true" data-row="${count}">                                            
+                            @if (!$products->isEmpty())
+                                <option value="0">Please Select</option>
+                            @foreach ($products as $product)
+                                <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-cost="{{ $product->cost ?? 0 }}" data-qty="{{ $product->qty ?? 0 }}">{{ $product->name.' ('.$product->code.')' }}</option>
+                            @endforeach
+                            @endif
+                        </select> 
+                    </td>                                        
+                    <td><input type="text" class="form-control vehicle_no text-left" name="products[${count}][vehicle_no]" id="products_${count}_vehicle_no"  data-row="${count}"></td>
+                    <td><input type="text" class="form-control text-left" name="products[${count}][challan_no]" id="products_${count}_challan_no"  data-row="${count}"></td>
+                    <td class="products_${count}_stock_qty text-center"></td>
+                    <td><input type="text" class="form-control qty text-center" onkeyup="calculateRowTotal(${count})" name="products[${count}][qty]" id="products_${count}_qty"  data-row="${count}"></td>
+                    <td><input type="text" class="text-right form-control price" onkeyup="calculateRowTotal(${count})" name="products[${count}][price]" id="products_${count}_price" data-row="${count}"></td>
+                    <td class="subtotal_${count} text-right" data-row="${count}"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button></td>
+                    <input type="hidden" class="text-right form-control" onkeyup="calculateRowTotal(${count})" name="products[${count}][stock_qty]" id="products_${count}_stock_qty" data-row="${count}">
+                    <input type="hidden" class="text-right form-control net_unit_cost" onkeyup="calculateRowTotal(${count})" name="products[${count}][net_unit_cost]" id="products_${count}_net_unit_cost" data-row="${count}">
+                    <input type="hidden" class="subtotal" id="products_${count}_subtotal" name="products[${count}][subtotal]" data-row="${count}">
+                    <input type="hidden" class="subtotal_cost" id="products_${count}_subtotal_cost" name="products[${count}][subtotal_cost]" data-row="${count}">
+                </tr>`;
+    $('#product_table tbody').append(html);
+    $('#product_table .selectpicker').selectpicker();
+} 
 
 function setProductData(row)
 {
@@ -484,7 +486,7 @@ function showNewFormModal(modal_title, btn_text) {
 
 
 
-function store_data(){
+function store_data(type){
     var rownumber = $('table#product_table tbody tr:last').index();
     if (rownumber < 0) {
         let error = '{{__('file.Please insert product to order table!')}}'
@@ -502,10 +504,10 @@ function store_data(){
             processData: false,
             cache: false,
             beforeSend: function(){
-                $('#sale-save-btn').addClass('spinner spinner-white spinner-right');
+                $('#sale-save-btn'+type).addClass('spinner spinner-white spinner-right');
             },
             complete: function(){
-                $('#sale-save-btn').removeClass('spinner spinner-white spinner-right');
+                $('#sale-save-btn'+type).removeClass('spinner spinner-white spinner-right');
             },
             success: function (data) {
                 $('#sale_store_form').find('.is-invalid').removeClass('is-invalid');
@@ -523,7 +525,27 @@ function store_data(){
                 } else {
                     notification(data.status, data.message);
                     if (data.status == 'success') {
-                        window.location.replace("{{ route('sale') }}");
+                        if(type == 1)
+                        {
+                            window.location.replace("{{ route('sale') }}");
+                        }else{
+
+                            $('#invoice_no').val(data.invoice_no);
+                            $('#product_table tbody').find('tr').remove();
+
+                            $('.product_data').val('');
+                            $('.product_data').text('');
+                            $('#total-qty').text('0');
+                            $('#total').text('0.00');
+                            $('.payment_data').val('');
+                            $('#payment_status,#payment_method,#reference_no').val('');
+                            $('#account_id').empty();
+                            $('.payment_row').addClass('d-none');
+                            $('.reference_no').addClass('d-none');
+                            $('#payment_status.selectpicker,#payment_method.selectpicker,#account_id.selectpicker,#products_1_id.selectpicker').selectpicker('refresh');
+                            count = 1;
+                            product_row_add(count);
+                        }
 
                     }
                 }

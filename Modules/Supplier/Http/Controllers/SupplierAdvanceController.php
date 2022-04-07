@@ -74,7 +74,7 @@ class SupplierAdvanceController extends BaseController
                     }
                     $row[] = translate($no,App::getLocale());
                     $row[] = $value->name.' - '.$value->mobile;
-                    $row[] = ($value->debit != 0) ? 'Payment' : 'Receive' ;
+                    $row[] = ($value->debit != 0) ? 'Receive' : 'Payment' ;
                     $row[] = translate(number_format((($value->debit != 0) ? $value->debit : $value->credit),2,'.',','),App::getLocale());
                     $row[] = APPROVE_STATUS_LABEL[$value->approve];
                     $row[] = translate(date('d-m-Y',strtotime($value->created_at)),App::getLocale());
@@ -137,8 +137,8 @@ class SupplierAdvanceController extends BaseController
                 'voucher_type'        => 'Advance',
                 'voucher_date'        => date("Y-m-d"),
                 'description'         => 'Supplier Advance For '.$supplier_name,
-                'debit'               => ($type == 'credit') ? $amount : 0,
-                'credit'              => ($type == 'debit') ? $amount : 0,
+                'debit'               => ($type == 'debit') ? $amount : 0,
+                'credit'              => ($type == 'credit') ? $amount : 0,
                 'posted'              => 1,
                 'approve'             => 3,
                 'created_by'          => auth()->user()->name,
@@ -180,8 +180,8 @@ class SupplierAdvanceController extends BaseController
 
             $updated = $supplier_advance_data->update([
                 'description'         => 'Supplier Advance For '.$supplier_name,
-                'debit'               => ($type == 'credit') ? $amount : 0,
-                'credit'              => ($type == 'debit') ? $amount : 0,
+                'debit'               => ($type == 'debit') ? $amount : 0,
+                'credit'              => ($type == 'credit') ? $amount : 0,
                 'modified_by'         => auth()->user()->name,
                 'updated_at'          => date('Y-m-d H:i:s')
             ]);

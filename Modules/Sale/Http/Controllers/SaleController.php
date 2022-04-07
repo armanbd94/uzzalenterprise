@@ -151,6 +151,7 @@ class SaleController extends BaseController
                         DB::rollback();
                     }
                     $output  = $this->store_message($sale, $request->purchase_id);
+                    $output['invoice_no'] = date('ymd').'-'.date('His');
                     DB::commit();
                 } catch (Exception $e) {
                     DB::rollback();

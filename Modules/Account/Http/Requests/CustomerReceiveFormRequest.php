@@ -26,10 +26,6 @@ class CustomerReceiveFormRequest extends FormRequest
     public function messages()
     {
         return [
-            'warehouse_id.required' => 'The warehouse field is required',
-            'district_id.required'  => 'The district field is required',
-            'upazila_id.required'   => 'The upazila field is required',
-            'route_id.required'     => 'The route field is required',
             'customer_id.required'  => 'The customer field is required',
             'account_id.required'   => 'The account field is required'
         ];

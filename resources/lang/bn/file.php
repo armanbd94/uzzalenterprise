@@ -1644,6 +1644,13 @@ return [
     'Total Supplier Due' => 'মোট সাপ্লাইয়ার বকেয়া',
     'Total Customer Due' => 'মোট কাস্টমার বকেয়া',
     'Total Sale' => 'মোট বিক্রয়',
+    'Edit Supplier Payment'                      => 'এডিট সাপ্লাইয়ার পরিশোধ',
+    'Supplier Payment Form'                      => 'সাপ্লাইয়ার পরিশোধের ফর্ম',
+    'Supplier Payment List'                      => 'সাপ্লাইয়ার পরিশোধের তালিকা',
+    'Edit Customer Receive'                      => 'এডিট কাস্টমার গ্রহণ',
+    'Customer Receive Form'                      => 'কাস্টমার গ্রহণের ফর্ম',
+    'Customer Receive List'                      => 'কাস্টমার গ্রহণের তালিকা',
+    'Save & Add New'                      => 'সেভ এবং নতুন তৈরি করুন ',
 
     'Mill Rent,Other Expense And Received Amount'                                                   => 'মিল ভাড়া,অন্যান খরচসমূহ এবং টাকা পরিশোধ',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                              => 'ব্যাপারীর মালামাল উৎপাদন,ডেলিভারী,মিল ভাড়ার রিপোর্ট ',

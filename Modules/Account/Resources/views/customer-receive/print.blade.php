@@ -12,8 +12,8 @@
                 <div class="card-toolbar">
                     <!--begin::Button-->
                     <button type="button" class="btn btn-primary btn-sm mr-3" id="print-invoice"> <i class="fas fa-print"></i> {{__('file.Print')}}</button>
-                    @if (permission('supplier-payment-access'))
-                    <a href="{{ url('supplier-payment') }}" class="btn btn-warning btn-sm font-weight-bolder">
+                    @if (permission('customer-receive-access'))
+                    <a href="{{ url('customer-receive') }}" class="btn btn-warning btn-sm font-weight-bolder">
                         <i class="fas fa-arrow-left"></i> {{__('file.Back')}}</a>
                     @endif
                     <!--end::Button-->

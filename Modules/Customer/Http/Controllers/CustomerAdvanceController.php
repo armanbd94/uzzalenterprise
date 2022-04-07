@@ -73,7 +73,7 @@ class CustomerAdvanceController extends BaseController
                 $row[] = $value->customer_name.'<br><b>Mobile No. </b>'.translate($value->mobile,App::getLocale());
                 $row[] = $value->address;
                 $row[] = $value->city;
-                $row[] = ($value->debit != 0) ? 'Receive' : 'Payment' ;
+                $row[] = ($value->debit != 0) ? 'Payment' : 'Receive' ;
                 $row[] = ($value->debit != 0) ? translate(number_format($value->debit,2,'.',','),App::getLocale()) : translate(number_format($value->credit,2,'.',','),App::getLocale());
                 $row[] = APPROVE_STATUS_LABEL[$value->approve];
                 $row[] = translate(date('d-m-Y',strtotime($value->created_at)),App::getLocale());

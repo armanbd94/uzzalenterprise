@@ -28,7 +28,7 @@
                         <img src="{{asset('images/purchase.svg')}}" alt="purchase" class="icon">
                     </span>
                     <h6 id="purchase" class="m-0">{{ number_format($purchase,2) }}{{__('file.TK')}}</h6>
-                    <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Purchase')}}</a>
+                    <a href="javascript::void();" class="font-weight-bold font-size-h7 mt-2">{{__('file.Purchase')}}</a>
                 </div>
             </div>
             <div class="col-md-4">
@@ -37,7 +37,7 @@
                         <img src="{{asset('images/sale.svg')}}" alt="sale" class="icon">
                     </span>
                     <h6 id="sale" class="m-0">{{ number_format($sale,2) }}{{__('file.TK')}}</h6>
-                    <a href="{{ route('sale') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Sale')}}</a>
+                    <a href="javascript::void();" class="font-weight-bold font-size-h7 mt-2">{{__('file.Sale')}}</a>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
                         <img src="{{asset('images/expense.svg')}}" alt="expense" class="icon">
                     </span>
                     <h6 id="expense" class="m-0">{{ number_format($total_expense_amount,2) }}{{__('file.TK')}}</h6>
-                    <a href="{{ route('purchase') }}" class="font-weight-bold font-size-h7 mt-2">{{__('file.Expense')}}</a>
+                    <a href="javascript::void();" class="font-weight-bold font-size-h7 mt-2">{{__('file.Expense')}}</a>
                 </div>
             </div>
         </div>

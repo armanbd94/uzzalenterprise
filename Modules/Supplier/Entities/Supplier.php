@@ -22,7 +22,7 @@ class Supplier extends BaseModel
         ->where('voucher_type','PR Balance')->withDefault(['debit' => '']);
     }
 
-    public function supplier_balance(int $id)
+    public static function supplier_balance(int $id)
     {
         $data = DB::table('suppliers as s')
             ->selectRaw('s.id,b.id as coaid,b.code,((select ifnull(sum(debit),0) from transactions where chart_of_account_id= b.id AND approve = 1)-(select ifnull(sum(credit),0) from transactions where chart_of_account_id= b.id AND approve = 1)) as balance')

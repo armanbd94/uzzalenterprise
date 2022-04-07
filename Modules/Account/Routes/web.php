@@ -38,12 +38,28 @@ Route::group(['middleware' => ['auth','language']], function () {
     Route::resource('cash-adjustment', 'CashAdjustmentController')->only(['index','store']);
 
     //Supplier Payment Route
-    Route::resource('supplier-payment', 'SupplierPaymentController')->only(['index','store']);
-    Route::get('supplier-payment/{id}/{payment_type}', 'SupplierPaymentController@show');
+    Route::get('supplier-payment', 'SupplierPaymentController@index')->name('supplier.payment');
+    Route::group(['prefix' => 'supplier-payment', 'as'=>'supplier.payment.'], function () {
+        Route::get('create', 'SupplierPaymentController@create')->name('create');
+        Route::post('store', 'SupplierPaymentController@store')->name('store');
+        Route::get('show/{id}/{payment_type}', 'SupplierPaymentController@show')->name('show');
+        Route::get('edit/{voucher_no}', 'SupplierPaymentController@edit')->name('edit');
+        Route::post('update', 'SupplierPaymentController@update')->name('update');
+        Route::post('delete', 'SupplierPaymentController@delete')->name('delete');
+        Route::post('datatable-data', 'SupplierPaymentController@get_datatable_data')->name('datatable.data');
+    });
 
     //Customer Receive Route
-    Route::resource('customer-receive', 'CustomerReceiveController')->only(['index','store']);
-    Route::get('customer-receive/{id}/{payment_type}', 'CustomerReceiveController@show');
+    Route::get('customer-receive', 'CustomerReceiveController@index')->name('customer.receive');
+    Route::group(['prefix' => 'customer-receive', 'as'=>'customer.receive.'], function () {
+        Route::get('create', 'CustomerReceiveController@create')->name('create');
+        Route::post('store', 'CustomerReceiveController@store')->name('store');
+        Route::get('show/{id}/{payment_type}', 'CustomerReceiveController@show')->name('show');
+        Route::get('edit/{voucher_no}', 'CustomerReceiveController@edit')->name('edit');
+        Route::post('update', 'CustomerReceiveController@update')->name('update');
+        Route::post('delete', 'CustomerReceiveController@delete')->name('delete');
+        Route::post('datatable-data', 'CustomerReceiveController@get_datatable_data')->name('datatable.data');
+    });
 
     //Debit Voucher Route
     Route::resource('debit-voucher', 'DebitVoucherController')->only(['index','store']);

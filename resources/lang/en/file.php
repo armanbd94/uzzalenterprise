@@ -1657,7 +1657,13 @@ return [
     'Total Supplier Due' => 'Total Supplier Due',
     'Total Customer Due' => 'Total Customer Due',
     'Total Sale' => 'Total Sale',
-
+    'Edit Supplier Payment'                      => 'Edit Supplier Payment',
+    'Supplier Payment Form'                      => 'Supplier Payment Form',
+    'Supplier Payment List'                      => 'Supplier Payment List',
+    'Customer Receive Form'                      => 'Customer Receive Form',
+    'Edit Customer Receive'                      => 'Edit Customer Receive',
+    'Customer Receive List'                      => 'Customer Receive List',
+    'Save & Add New' => 'Save & Add New',
 
     'Mill Rent,Other Expense And Received Amount'                                                       => 'Mill Rent,Other Expense And Received Amount',
     'Dealer Goods Production,Delivery,Mil Rent Report'                                                  => 'Dealer Goods Production,Delivery,Mil Rent Report',

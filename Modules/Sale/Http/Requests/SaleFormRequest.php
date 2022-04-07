@@ -28,7 +28,7 @@ class SaleFormRequest extends FormRequest
         if(request()->has('products'))
         {
             foreach (request()->products as $key => $value) {
-                $this->rules['products.'.$key.'.qty']             = ['required','numeric','gt:0','lte:'.$value['stock_qty']];
+                $this->rules['products.'.$key.'.qty']             = ['required','numeric','gt:0'];
                 $this->messages['products.'.$key.'.qty.required'] = 'This field is required';
                 $this->messages['products.'.$key.'.qty.numeric']  = 'The value must be numeric';
                 $this->messages['products.'.$key.'.qty.gt']       = 'The value must be greater than 0';
