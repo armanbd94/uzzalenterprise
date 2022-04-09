@@ -20,7 +20,7 @@
                     <!--begin::Button-->
                     <button type="button" class="btn btn-primary btn-sm mr-3" id="print-invoice"> <i class="fas fa-print"></i>{{__('file.Print')}}</button>
 
-                    <a href="{{ route('purchase') }}" class="btn btn-warning btn-sm font-weight-bolder">
+                    <a href="{{ route('sale') }}" class="btn btn-warning btn-sm font-weight-bolder">
                         <i class="fas fa-arrow-left"></i>{{__('file.Back')}}</a>
                     <!--end::Button-->
                 </div>

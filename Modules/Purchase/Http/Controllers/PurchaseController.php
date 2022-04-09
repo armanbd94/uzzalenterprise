@@ -13,6 +13,7 @@ use Modules\Supplier\Entities\Supplier;
 use App\Http\Controllers\BaseController;
 use Modules\Account\Entities\Transaction;
 use Modules\Product\Entities\WarehouseProduct;
+use Modules\Purchase\Entities\PurchaseProduct;
 use Modules\Purchase\Http\Requests\PurchaseFormRequest;
 
 class PurchaseController extends BaseController
@@ -137,11 +138,12 @@ class PurchaseController extends BaseController
                     if($request->has('products'))
                     {
                         foreach ($request->products as $key => $value) {
-                            $products[$value['id']] = $this->model->purchase_products_data($request->warehouse_id,$value);
+                            $value['purchase_id'] = $purchase->id;
+                            $products[] = $this->model->purchase_products_data($request->warehouse_id,$value);
                         }
                     }
                     if(count($products) > 0){
-                        $purchase->purchase_products()->sync($products);
+                        PurchaseProduct::insert($products);
                     }
 
                     $supplier = Supplier::with('coa')->find($request->supplier_id);
@@ -151,6 +153,7 @@ class PurchaseController extends BaseController
                         DB::rollback();
                     }
                     $output  = $this->store_message($purchase, $request->purchase_id);
+                    $output['memo_no'] = date('ymd').'-'.date('His');
                     DB::commit();
                 } catch (Exception $e) {
                     DB::rollback();
@@ -203,27 +206,13 @@ class PurchaseController extends BaseController
                 // dd($request->all());
                 DB::beginTransaction();
                 try {
-                    $purchaseData = $this->model->with('purchase_products','supplier')->find($request->purchase_id);
-                    if(!$purchaseData->purchase_products->isEmpty())
+                    $purchaseData = $this->model->with('hasManyProducts','supplier')->find($request->purchase_id);
+                    if(!$purchaseData->hasManyProducts->isEmpty())
                     {
-                        foreach ($purchaseData->purchase_products as  $product) {
-                            $received_qty = $product->pivot->qty;
-                            $product_data = Product::find($product->id);
-                            if($product_data)
-                            {
-                                $product_data->qty     -= $received_qty;
-                                $product_data->cost     = $product->pivot->current_unit_cost;
-                                $product_data->old_cost = $product->pivot->old_unit_cost;
-                                $product_data->update();
-                            }
-                            $warehouse_product = WarehouseProduct::where([
-                                'warehouse_id' => $purchaseData->warehouse_id,
-                                'product_id'   => $product->id])->first();
-                            if($warehouse_product)
-                            {
-                                $warehouse_product->qty -= $received_qty;
-                                $warehouse_product->update();
-                            }
+                        $remove_products = $this->model->purchase_products_remove($purchaseData);
+                        if($remove_products == false)
+                        {
+                            DB::rollBack();
                         }
                     }
                     //purchase products
@@ -231,11 +220,12 @@ class PurchaseController extends BaseController
                     if($request->has('products'))
                     {
                         foreach ($request->products as $key => $value) {
-                            $products[$value['id']] = $this->model->purchase_products_data($request->warehouse_id,$value);
+                            $value['purchase_id'] = $request->purchase_id;
+                            $products[] = $this->model->purchase_products_data($request->warehouse_id,$value);
                         }
                     }
                      if(count($products) > 0){
-                        $purchaseData->purchase_products()->sync($products);
+                        PurchaseProduct::insert($products);
                      }
                     Transaction::where(['voucher_no'=>$purchaseData->memo_no,'voucher_type'=>'Purchase'])->delete();
                     $supplier    = Supplier::with('coa')->find($request->supplier_id);
@@ -266,8 +256,8 @@ class PurchaseController extends BaseController
             if(permission('purchase-delete')){
                 DB::beginTransaction();
                 try {
-                    $purchaseData = Purchase::with('purchase_products')->find($request->id);
-                    if(!$purchaseData->purchase_products->isEmpty())
+                    $purchaseData = Purchase::with('hasManyProducts')->find($request->id);
+                    if(!$purchaseData->hasManyProducts->isEmpty())
                     {
                         $remove_products = $this->model->purchase_products_remove($purchaseData);
                         if($remove_products == false)
@@ -300,8 +290,8 @@ class PurchaseController extends BaseController
                     DB::beginTransaction();
                     try {
                         foreach ($request->ids as $id) {
-                            $purchaseData = Purchase::with('purchase_products')->find($id);
-                            if(!$purchaseData->purchase_products->isEmpty())
+                            $purchaseData = Purchase::with('hasManyProducts')->find($id);
+                            if(!$purchaseData->hasManyProducts->isEmpty())
                             {
                                 $remove_products = $this->model->purchase_products_remove($purchaseData);
                                 if($remove_products == false)

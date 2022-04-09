@@ -199,6 +199,8 @@ class Purchase extends BaseModel
         }
         
         return [
+            'purchase_id'       => $value['purchase_id'],
+            'product_id'        => $value['id'],
             'vehicle_no'        => $value['vehicle_no'],
             'challan_no'        => $value['challan_no'],
             'qty'               => $value['qty'],
@@ -300,15 +302,15 @@ class Purchase extends BaseModel
     public function purchase_products_remove($purchaseData)
     {
         
-        foreach ($purchaseData->purchase_products as  $product) {
+        foreach ($purchaseData->hasManyProducts as  $product) {
 
-            $received_qty = $product->pivot->qty;
+            $received_qty = $product->qty;
             $product_data = Product::find($product->id);
             if($product_data)
             {
                 $product_data->qty -= $received_qty;
-                $product_data->cost = $product->pivot->current_unit_cost;
-                $product_data->old_cost = $product->pivot->old_unit_cost;
+                $product_data->cost = $product->current_unit_cost;
+                $product_data->old_cost = $product->old_unit_cost;
                 $product_data->update();
             }
             $warehouse_product = WarehouseProduct::where([
@@ -321,7 +323,7 @@ class Purchase extends BaseModel
             }
         
         }
-        return $purchaseData->purchase_products()->detach();
+        return $purchaseData->hasManyProducts()->delete();
         
     }
 }
