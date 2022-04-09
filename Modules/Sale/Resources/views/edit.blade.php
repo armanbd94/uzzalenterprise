@@ -60,7 +60,6 @@
                                         <th class="text-center">{{__('file.Name')}}</th>
                                         <th class="text-center">{{__('file.Vehicle No')}}</th>
                                         <th class="text-center">{{__('file.Challan No')}}</th>
-                                        <th class="text-center">{{__('file.Stock Qty')}}</th>
                                         <th class="text-center">{{__('file.Quantity')}}</th>
                                         <th class="text-right">{{__('file.Price')}}</th>
                                         <th class="text-right">{{__('file.Subtotal')}}</th>
@@ -69,10 +68,6 @@
                                     <tbody>
                                         @if(!$sale->hasManyProducts->isEmpty())
                                         @foreach ($sale->hasManyProducts as $key => $item)
-                                        @php
-                                            $product_qty = DB::table('products')->where('id',$item->product_id)->value('qty');
-                                            $stock_qty = ($product_qty ?? 0) + $item->qty;
-                                        @endphp
                                         <tr>
                                             <td>                                                  
                                                 <select name="products[{{ $key+1 }}][id]" id="products_{{ $key+1 }}_id" onchange="setProductData({{ $key+1 }})" class="fcs col-md-12 form-control selectpicker"  data-live-search="true" data-row="{{ $key+1 }}">                                            
@@ -80,14 +75,13 @@
                                                         <option value="0">Please Select</option>
                                                     @foreach ($products as $product)
                                                         <option value="{{ $product->id }}" {{ $item->product_id == $product->id ? 'selected' : '' }} data-price="{{ $product->price }}" 
-                                                            data-cost="{{ $product->cost ?? 0 }}" data-qty="{{ $item->product_id == $product->id ? $stock_qty : ($product->qty ?? 0) }}">{{ $product->name.' ('.$product->code.')' }}</option>
+                                                            data-cost="{{ $product->cost ?? 0 }}">{{ $product->name.' ('.$product->code.')' }}</option>
                                                     @endforeach
                                                     @endif
                                                 </select> 
                                             </td>                                        
                                             <td><input type="text" class="form-control vehicle_no text-left" value="{{ $item->vehicle_no }}" name="products[{{ $key+1 }}][vehicle_no]" id="products_{{ $key+1 }}_vehicle_no"  data-row="{{ $key+1 }}"></td>
                                             <td><input type="text" class="form-control text-left" value="{{ $item->challan_no }}" name="products[{{ $key+1 }}][challan_no]" id="products_{{ $key+1 }}_challan_no"  data-row="{{ $key+1 }}"></td>
-                                            <td class="products_{{ $key+1 }}_stock_qty text-center">{{ $stock_qty }}</td>
                                             <td><input type="text" class="form-control qty text-center" value="{{ $item->qty }}" onkeyup="calculateRowTotal({{ $key+1 }})" name="products[{{ $key+1 }}][qty]" id="products_{{ $key+1 }}_qty"  data-row="{{ $key+1 }}"></td>
                                             <td><input type="text" class="text-right form-control price" value="{{ $item->price }}" onkeyup="calculateRowTotal({{ $key+1 }})" name="products[{{ $key+1 }}][price]" id="products_{{ $key+1 }}_price" data-row="{{ $key+1 }}"></td>
                                             <td class="subtotal_{{ $key+1 }} text-right" data-row="{{ $key+1 }}">{{ number_format($item->total,2,'.','') }}</td>
@@ -96,7 +90,6 @@
                                                 <button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button>
                                                 @endif
                                             </td>
-                                            <input type="hidden" class="text-right form-control" value="{{ $stock_qty }}" name="products[{{ $key+1 }}][stock_qty]" id="products_{{ $key+1 }}_stock_qty" data-row="{{ $key+1 }}">
                                             <input type="hidden" class="text-right form-control net_unit_cost" value="{{ $item->net_unit_cost }}" name="products[{{ $key+1 }}][net_unit_cost]" id="products_{{ $key+1 }}_net_unit_cost" data-row="{{ $key+1 }}">
                                             <input type="hidden" class="subtotal" id="products_{{ $key+1 }}_subtotal" value="{{ $item->total }}" name="products[{{ $key+1 }}][subtotal]" data-row="{{ $key+1 }}">
                                             <input type="hidden" class="subtotal_cost" id="products_{{ $key+1 }}_subtotal_cost" value="{{ $item->total_cost }}" name="products[{{ $key+1 }}][subtotal_cost]" data-row="{{ $key+1 }}">
@@ -106,7 +99,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="4" class="font-weight-bolder">{{ __('file.Total') }}</td>
+                                            <td colspan="3" class="font-weight-bolder">{{ __('file.Total') }}</td>
                                             <td id="total-qty" class="text-center font-weight-bolder">{{ $sale->total_qty }}</td>
                                             <td></td>
                                             <td id="total" class="text-right font-weight-bolder">{{ number_format($sale->total_cost,2,'.','') }}</td>
@@ -115,12 +108,12 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right font-weight-bolder" colspan="6">{{ __('file.Shipping Cost') }}</td>
+                                            <td class="text-right font-weight-bolder" colspan="5">{{ __('file.Shipping Cost') }}</td>
                                             <td><input type="text" class="fcs form-control text-right" value="{{ $sale->shipping_cost }}" name="shipping_cost" id="shipping_cost" onkeyup="calculateNetTotal()" placeholder="0.00"></td>
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td colspan="5">
+                                            <td colspan="4">
                                                 <div class="row">
                                                     <x-form.selectbox labelName="{{ __('file.Payment Status') }}" name="payment_status" required="required"  col="col-md-6 mb-0" class="fcs selectpicker" data-live-search="true">
                                                         @foreach (PAYMENT_STATUS as $key => $value)
@@ -139,7 +132,7 @@
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td colspan="5">
+                                            <td colspan="4">
                                                 <div class="row payment_row {{ $sale->payment_status != 3 ? '' : 'd-none' }}">
                                                     <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-6" class="fcs selectpicker"/>
                                                     <div class="form-group col-md-6 {{ $sale->payment_method != 1 ? '': 'd-none'}} reference_no">
@@ -157,7 +150,7 @@
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right font-weight-bolder" colspan="6">{{ __('file.Due Amount') }}</td>
+                                            <td class="text-right font-weight-bolder" colspan="5">{{ __('file.Due Amount') }}</td>
                                             <td><input type="text" class="fcs form-control bg-secondary text-right" value="{{ $sale->due_amount }}" name="due_amount" id="due_amount" placeholder="0.00" readonly></td>
                                             <td></td>
                                         </tr>
@@ -249,19 +242,17 @@ $(document).ready(function () {
                                 @if (!$products->isEmpty())
                                     <option value="0">Please Select</option>
                                 @foreach ($products as $product)
-                                    <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-cost="{{ $product->cost ?? 0 }}" data-qty="{{ $product->qty ?? 0 }}">{{ $product->name.' ('.$product->code.')' }}</option>
+                                    <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-cost="{{ $product->cost ?? 0 }}">{{ $product->name.' ('.$product->code.')' }}</option>
                                 @endforeach
                                 @endif
                             </select> 
                         </td>                                        
                         <td><input type="text" class="form-control vehicle_no text-left" name="products[${count}][vehicle_no]" id="products_${count}_vehicle_no"  data-row="${count}"></td>
                         <td><input type="text" class="form-control text-left" name="products[${count}][challan_no]" id="products_${count}_challan_no"  data-row="${count}"></td>
-                        <td class="products_${count}_stock_qty text-center"></td>
                         <td><input type="text" class="form-control qty text-center" onkeyup="calculateRowTotal(${count})" name="products[${count}][qty]" id="products_${count}_qty"  data-row="${count}"></td>
                         <td><input type="text" class="text-right form-control price" onkeyup="calculateRowTotal(${count})" name="products[${count}][price]" id="products_${count}_price" data-row="${count}"></td>
                         <td class="subtotal_${count} text-right" data-row="${count}"></td>
                         <td><button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button></td>
-                        <input type="hidden" class="text-right form-control" onkeyup="calculateRowTotal(${count})" name="products[${count}][stock_qty]" id="products_${count}_stock_qty" data-row="${count}">
                         <input type="hidden" class="text-right form-control net_unit_cost" onkeyup="calculateRowTotal(${count})" name="products[${count}][net_unit_cost]" id="products_${count}_net_unit_cost" data-row="${count}">
                         <input type="hidden" class="subtotal" id="products_${count}_subtotal" name="products[${count}][subtotal]" data-row="${count}">
                         <input type="hidden" class="subtotal_cost" id="products_${count}_subtotal_cost" name="products[${count}][subtotal_cost]" data-row="${count}">
@@ -353,12 +344,9 @@ $(document).ready(function () {
 
 function setProductData(row)
 {
-    let qty = $(`#products_${row}_id option:selected`).data('qty');
     let cost = $(`#products_${row}_id option:selected`).data('cost');
     let price = $(`#products_${row}_id option:selected`).data('price');
 
-    $(`.products_${row}_stock_qty`).text(parseFloat(qty ? qty : 0));
-    $(`#products_${row}_stock_qty`).val(parseFloat(qty ? qty : 0));
     $(`#products_${row}_net_unit_cost`).val(parseFloat(cost ? cost : 0));
     $(`#products_${row}_price`).val(parseFloat(price ? price : 0));
     calculateRowTotal(row);

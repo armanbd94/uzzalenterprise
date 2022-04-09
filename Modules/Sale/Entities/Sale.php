@@ -187,6 +187,8 @@ class Sale extends BaseModel
         }
         
         return [
+            'sale_id' => $value['sale_id'],
+            'product_id' => $value['id'],
             'vehicle_no' => $value['vehicle_no'],
             'challan_no' => $value['challan_no'],
             'qty'        => $value['qty'],
@@ -287,9 +289,9 @@ class Sale extends BaseModel
     public function sale_products_remove($saleData)
     {
         
-        foreach ($saleData->sale_products as  $product) {
+        foreach ($saleData->hasManyProducts as  $product) {
 
-            $sold_qty = $product->pivot->qty;
+            $sold_qty = $product->qty;
             $product_data = Product::find($product->id);
             if($product_data)
             {
@@ -306,7 +308,7 @@ class Sale extends BaseModel
             }
         
         }
-        return $saleData->sale_products()->detach();
+        return $saleData->hasManyProducts()->delete();
         
     }
 

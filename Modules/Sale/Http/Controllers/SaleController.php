@@ -14,6 +14,7 @@ use App\Http\Controllers\BaseController;
 use Modules\Account\Entities\Transaction;
 use Modules\Setting\Entities\CustomerGroup;
 use Modules\Product\Entities\WarehouseProduct;
+use Modules\Sale\Entities\SaleProduct;
 use Modules\Sale\Http\Requests\SaleFormRequest;
 
 
@@ -110,7 +111,7 @@ class SaleController extends BaseController
     public function create()
     {
         if(permission('sale-add')){
-            $setTitle = __('file.Add Purchase');
+            $setTitle = __('file.Add Sale');
             $this->setPageData($setTitle,$setTitle,'fas fa-shopping-cart',[['name' => $setTitle]]);
             $data = [
                 'warehouses' => Warehouse::activeWarehouses(),
@@ -138,11 +139,12 @@ class SaleController extends BaseController
                     if($request->has('products'))
                     {
                         foreach ($request->products as $key => $value) {
-                            $products[$value['id']] = $this->model->sale_products_data($request->warehouse_id,$value);
+                            $value['sale_id'] = $sale->id;
+                            $products[] = $this->model->sale_products_data($request->warehouse_id,$value);
                         }
                     }
                     if(count($products) > 0){
-                        $sale->sale_products()->sync($products);
+                        SaleProduct::insert($products);
                     }
                     $customer = Customer::with('coa')->find($request->customer_id);
                     $transaction = $this->model->sale_balance_add($customer->coa->id,$request);//store sale transaction data
@@ -205,25 +207,13 @@ class SaleController extends BaseController
                 // dd($request->all());
                 DB::beginTransaction();
                 try {
-                    $saleData = $this->model->with('sale_products','customer')->find($request->sale_id);
-                    if(!$saleData->sale_products->isEmpty())
+                    $saleData = $this->model->with('hasManyProducts','customer')->find($request->sale_id);
+                    if(!$saleData->hasManyProducts->isEmpty())
                     {
-                        foreach ($saleData->sale_products as  $product) {
-                            $sold_qty = $product->pivot->qty;
-                            $product_data = Product::find($product->id);
-                            if($product_data)
-                            {
-                                $product_data->qty     += $sold_qty;
-                                $product_data->update();
-                            }
-                            $warehouse_product = WarehouseProduct::where([
-                                'warehouse_id' => $saleData->warehouse_id,
-                                'product_id'   => $product->id])->first();
-                            if($warehouse_product)
-                            {
-                                $warehouse_product->qty += $sold_qty;
-                                $warehouse_product->update();
-                            }
+                        $remove_products = $this->model->sale_products_remove($saleData);
+                        if($remove_products == false)
+                        {
+                            DB::rollBack();
                         }
                     }
                     //sale products
@@ -231,11 +221,12 @@ class SaleController extends BaseController
                     if($request->has('products'))
                     {
                         foreach ($request->products as $key => $value) {
-                            $products[$value['id']] = $this->model->sale_products_data($request->warehouse_id,$value);
+                            $value['sale_id'] = $request->sale_id;
+                            $products[] = $this->model->sale_products_data($request->warehouse_id,$value);
                         }
                     }
                      if(count($products) > 0){
-                        $saleData->sale_products()->sync($products);
+                        SaleProduct::insert($products);
                      }
                     Transaction::where(['voucher_no'=>$saleData->invoice_no,'voucher_type'=>'Invoice'])->delete();
                     $customer    = Customer::with('coa')->find($request->customer_id);
@@ -266,8 +257,8 @@ class SaleController extends BaseController
             if(permission('sale-delete')){
                 DB::beginTransaction();
                 try {
-                    $saleData = $this->model->with('sale_products')->find($request->id);
-                    if(!$saleData->sale_products->isEmpty())
+                    $saleData = $this->model->with('hasManyProducts')->find($request->id);
+                    if(!$saleData->hasManyProducts->isEmpty())
                     {
                         $remove_products = $this->model->sale_products_remove($saleData);
                         if($remove_products == false)
@@ -300,8 +291,8 @@ class SaleController extends BaseController
                     DB::beginTransaction();
                     try {
                         foreach ($request->ids as $id) {
-                            $saleData = $this->model->with('sale_products')->find($id);
-                            if(!$saleData->sale_products->isEmpty())
+                            $saleData = $this->model->with('hasManyProducts')->find($id);
+                            if(!$saleData->hasManyProducts->isEmpty())
                             {
                                 $remove_products = $this->model->sale_products_remove($saleData);
                                 if($remove_products == false)
